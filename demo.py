@@ -295,7 +295,7 @@ def main(_argv):
             total_count_file = open(counts_folder + str(current_date) + '/total/' + total_filename, 'a')
             print('{} writing...'.format(rounded_now))
             print('Writing current total count ({}) and directional counts to file.'.format(total_counter))
-            total_count_file.write('{}, {}, {}, {}, {}\n'.format(str(rounded_now), device, str(total_counter), up_count, down_count))
+            total_count_file.write('{}, {}, {}, {}, {}\n'.format(str(rounded_now), "device", str(total_counter), up_count, down_count))
             total_count_file.close()
 
             # if class exists in class counter, create file and write counts
@@ -307,7 +307,7 @@ def main(_argv):
               print('Writing current {} count ({}) to file.'.format(cls, class_count))
               class_filename = 'Class counts for {}, {}.txt'.format(current_date, ret)
               class_count_file = open(counts_folder + str(current_date) + '/classes/' + class_filename, 'a')
-              class_count_file.write("{}, {}, {}\n".format(rounded_now, device, str(class_count)))
+              class_count_file.write("{}, {}, {}\n".format(rounded_now, "device", str(class_count)))
               class_count_file.close()
 
             # write intersection details
@@ -327,7 +327,7 @@ def main(_argv):
 
               intersect_time = i[3]
 
-              intersection_file.write("{}, {}, {}, {}, {}, {}\n".format(str(intersect_time), device, cls, x, y, str(angle)))
+              intersection_file.write("{}, {}, {}, {}, {}, {}\n".format(str(intersect_time), "device", cls, mx, my, str(angle)))
             intersection_file.close()
             intersect_info = []  # reset list after writing
 

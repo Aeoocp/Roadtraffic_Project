@@ -82,11 +82,9 @@ def main(_argv):
           ssubbox.append(w)
           ssubbox.append(h)
           subbox.append(ssubbox)
-          classes_s.append(subclass)
-          confidence_s.append(subconfidence)
-          boxes_s.append(subbox)
-    
-    dip = len(boxes_s)//len(inform)
+      classes_s.append(subclass)
+      confidence_s.append(subconfidence)
+      boxes_s.append(subbox)
 
     # Definition of the parameters
     max_cosine_distance = 0.3
@@ -152,18 +150,14 @@ def main(_argv):
       
       image = Image.fromarray(frame[..., ::-1])  # bgr to rgb
       #boxes, confidence, classes = yolo.detect_image(image)
-      if x*dip < len(boxes_s):
-        boxes = boxes_s[x*dip]
-        confidence = confidence_s[x*dip]
-        classes = classes_s[x*dip]
+      if x < len(boxes_s):
+        boxes = boxes_s[x]
+        confidence = confidence_s[x]
+        classes = classes_s[x]
       x = x+1
       #print("boxes",boxes)
       #print("confidence",confidence)
       #print("classes",classes)
-      #boxes = [[327.0, 614.0, 448.0, 709.0], [677.0, 461.0, 742.0, 515.0], [587.0, 427.0, 646.0, 475.0], [786.0, 392.0, 829.0, 430.0], [768.0, 340.0, 806.0, 379.0], [773.0, 304.0, 804.0, 333.0], [240.0, 664.0, 282.0, 710.0], [1195.0, 362.0, 1252.0, 387.0], [698.0, 391.0, 754.0, 447.0], [699.0, 391.0, 754.0, 447.0], [29.0, 383.0, 65.0, 405.0], [831.0, 248.0, 851.0, 272.0], [788.0, 278.0, 814.0, 300.0], [788.0, 278.0, 813.0, 300.0]]
-      #confidence = [94.36, 90.24, 90.1, 88.44, 86.64, 81.36, 80.49, 71.24, 57.56, 56.53, 49.03, 48.6, 45.19, 25.28]
-      #classes = ['car', 'car', 'car', 'car', 'car', 'car', 'motorcycle', 'car', 'truck', 'car', 'car', 'truck', 'car', 'truck']
-      
       
       features = encoder(frame, boxes)
       detections = [Detection(bbox, confidence, cls, feature) for bbox, confidence, cls, feature in

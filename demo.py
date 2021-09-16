@@ -36,16 +36,15 @@ def main(_argv):
     input_T = FLAGS.text
     file1 = open(input_T, "r")
     FileContent = file1.read()
-#    print(FileContent)
     AS = FileContent.split()
     inform = []
     car_num = []
     
     c = -1
-    yy = 0
+    y = 0
     for x in range(len(AS)-1):
         xx = AS[x].split(',')
-        if yy == 0:
+        if y == 0:
             if AS[x] == "#":
                 c = c+1
                 car_num.append(AS[x+3])
@@ -58,7 +57,7 @@ def main(_argv):
             elif  x > skip:
                 inform[c].append(AS[x])
         else:
-            yy = 0
+            y = 0
     
     boxes_s = []
     confidence_s = []
@@ -69,22 +68,22 @@ def main(_argv):
         subconfidence = []
         subbox = []
         for b in range(len(inform[a])):
-          eachBox = inform[a][b]
-          SEachBox = eachBox.split(',')
-          Frame = SEachBox[0]
-          subclass.append(SEachBox[1])
-          subconfidence.append(float(SEachBox[6]))
-          ssubbox = []
-          ssubbox.append(float(SEachBox[2]))
-          ssubbox.append(float(SEachBox[3]))
-          w = float(SEachBox[4]) - float(SEachBox[2])
-          h = float(SEachBox[5]) - float(SEachBox[3])
-          ssubbox.append(w)
-          ssubbox.append(h)
-          subbox.append(ssubbox)
-      classes_s.append(subclass)
-      confidence_s.append(subconfidence)
-      boxes_s.append(subbox)
+            eachBox = inform[a][b]
+            SEachBox = eachBox.split(',')
+            Frame = SEachBox[0]
+            subclass.append(SEachBox[1])
+            subconfidence.append(float(SEachBox[6]))
+            ssubbox = []
+            ssubbox.append(float(SEachBox[2]))
+            ssubbox.append(float(SEachBox[3]))
+            w = float(SEachBox[4]) - float(SEachBox[2])
+            h = float(SEachBox[5]) - float(SEachBox[3])
+            ssubbox.append(w)
+            ssubbox.append(h)
+            subbox.append(ssubbox)
+        classes_s.append(subclass)
+        confidence_s.append(subconfidence)
+        boxes_s.append(subbox)
 
     # Definition of the parameters
     max_cosine_distance = 0.3
@@ -149,15 +148,11 @@ def main(_argv):
       t1 = time.time()
       
       image = Image.fromarray(frame[..., ::-1])  # bgr to rgb
-      #boxes, confidence, classes = yolo.detect_image(image)
       if x < len(boxes_s):
         boxes = boxes_s[x]
         confidence = confidence_s[x]
         classes = classes_s[x]
       x = x+1
-      #print("boxes",boxes)
-      #print("confidence",confidence)
-      #print("classes",classes)
       
       features = encoder(frame, boxes)
       detections = [Detection(bbox, confidence, cls, feature) for bbox, confidence, cls, feature in

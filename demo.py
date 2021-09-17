@@ -51,9 +51,8 @@ def main(_argv):
                 skip = x+3
                 inform.append([])
             elif len(xx) == 2:
-                if xx[1] == 'traffic':
-                    y = 1
-                    inform[c].append(AS[x]+AS[x+1])
+                y = 1
+                inform[c].append(AS[x]+AS[x+1])
             elif  x > skip:
                 inform[c].append(AS[x])
         else:

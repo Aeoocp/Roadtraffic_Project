@@ -50,7 +50,7 @@ def main(_argv):
                 car_num.append(AS[x+3])
                 skip = x+3
                 inform.append([])
-            if len(xx) == 2:
+            elif len(xx) == 2:
                 if xx[1] != '':
                     y = 1
                     inform[c].append(AS[x]+AS[x+1])

@@ -70,8 +70,6 @@ def main(_argv):
         for b in range(len(inform[a])):
             eachBox = inform[a][b]
             SEachBox = eachBox.split(',')
-            if a == 213 :
-                print(SEachBox)
             Frame = SEachBox[0]
             subclass.append(SEachBox[1])
             subconfidence.append(float(SEachBox[6]))
@@ -86,7 +84,6 @@ def main(_argv):
         classes_s.append(subclass)
         confidence_s.append(subconfidence)
         boxes_s.append(subbox)
-    print(len(boxes_s))
 
     # Definition of the parameters
     max_cosine_distance = 0.3

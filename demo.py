@@ -177,13 +177,6 @@ def main(_argv):
       line2 = [(int(0.1 * frameX), int(0.1 * frameY)), (int(0.5 * frameX), int(0.5 * frameY))]
       cv2.line(frame, line2[0], line2[1], (255,0,255), 2)   #(image, start_point, end_point, color, thickness)
 
-      for det in detections:
-        bbox = det.to_tlbr()
-        if show_detections and len(classes) > 0:
-          det_cls = det.cls
-          score = "%.2f" % (det.confidence * 100) + "%"
-          cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (255, 0, 0), 2)
-
       for track in tracker.tracks:
         if not track.is_confirmed() or track.time_since_update > 1:
           continue
@@ -246,7 +239,7 @@ def main(_argv):
       if show_detections:
         for det in detections:
           bbox = det.to_tlbr()
-          score = "%.2f" % (det.confidence * 100) + "%"
+          cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1])), 0, 1.5e-3 * frame.shape[0], (0, 255, 0), 2)
           cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (255, 0, 0), 2)  # BLUE BOX
           if len(classes) > 0:
             det_cls = det.cls

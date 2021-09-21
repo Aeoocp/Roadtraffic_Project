@@ -233,15 +233,6 @@ def main(_argv):
           if angle < 0:
               down_count += 1
 
-        adc = "%.2f" % (track.adc * 100) + "%"  # Average detection confidence
-
-        cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (255, 255, 255), 2)
-        cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1])), 0, 1e-3 * frame.shape[0], (0, 255, 0), 1)
-        if not show_detections:
-          track_cls = track.cls
-          cv2.putText(frame, str(track_cls), (int(bbox[0]), int(bbox[3])), 0, 1e-3 * frame.shape[0], (0, 255, 0), 1)
-          cv2.putText(frame, 'ADC: ' + adc, (int(bbox[0]), int(bbox[3] + 2e-2 * frame.shape[1])), 0, 1e-3 * frame.shape[0], (0, 255, 0), 1)
-
       # Delete memory of old tracks.
       # This needs to be larger than the number of tracked objects in the frame.
       if len(memory) > 50:
@@ -259,7 +250,10 @@ def main(_argv):
           cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (255, 0, 0), 2)  # BLUE BOX
           if len(classes) > 0:
             det_cls = det.cls
-            cv2.putText(frame, str(det_cls) + " " + score, (int(bbox[0]), int(bbox[3])), 0, 1.5e-3 * frame.shape[0], (0, 255, 0), 2)
+            if det_cls == "car":
+              cv2.putText(frame, str(det_cls), (int(bbox[0]), int(bbox[3])), 0, 1.5e-3 * frame.shape[0], (0, 255, 0), 2)
+            else:
+              cv2.putText(frame, str(det_cls), (int(bbox[0]), int(bbox[3])), 0, 1.5e-3 * frame.shape[0], (0, 0, 255), 2)
 
       # display counts for each class as they appear
       my = 0.2 * frame.shape[0]

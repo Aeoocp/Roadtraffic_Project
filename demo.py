@@ -131,6 +131,8 @@ def main(_argv):
     total_counter = 0
     up_count = 0
     down_count = 0
+    up_count2 = 0
+    down_count2 = 0
 
     class_counter = Counter()  # store counts of each detected class
     already_counted = deque(maxlen=50)  # temporary memory for storing counted IDs
@@ -171,10 +173,10 @@ def main(_argv):
       #สร้างและวาดเส้นผ่าน
       frameY = frame.shape[0] #360
       frameX = frame.shape[1] #640
-      line = [(int(0.35 * frameX), int(0.5 * frameY)), (int(0.6 * frameX), int(0.5 * frameY))]
+      line = [(int(0.5 * frameX), int(0.5 * frameY)), (int(0.8 * frameX), int(0.5 * frameY))]
       cv2.line(frame, line[0], line[1], (0, 255, 255), 2)   #(image, start_point, end_point, color, thickness)
       #สร้างและวาดเส้นผ่านชมพู
-      line2 = [(int(0.1 * frameX), int(0.1 * frameY)), (int(0.5 * frameX), int(0.5 * frameY))]
+      line2 = [(int(0.1 * frameX), int(0.5 * frameY)), (int(0.3 * frameX), int(0.5 * frameY))]
       cv2.line(frame, line2[0], line2[1], (255,0,255), 2)   #(image, start_point, end_point, color, thickness)
 
       for track in tracker.tracks:

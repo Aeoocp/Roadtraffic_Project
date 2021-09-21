@@ -173,6 +173,9 @@ def main(_argv):
       frameX = frame.shape[1] #640
       line = [(int(0.35 * frameX), int(0.5 * frameY)), (int(0.6 * frameX), int(0.5 * frameY))]
       cv2.line(frame, line[0], line[1], (0, 255, 255), 2)   #(image, start_point, end_point, color, thickness)
+      #สร้างและวาดเส้นผ่านชมพู
+      line2 = [(int(0.1 * frameX), int(0.1 * frameY)), (int(0.5 * frameX), int(0.5 * frameY))]
+      cv2.line(frame, line2[0], line2[1], (255,0,255), 2)   #(image, start_point, end_point, color, thickness)
 
       for det in detections:
         bbox = det.to_tlbr()
@@ -247,7 +250,9 @@ def main(_argv):
 
       # Draw total count.
       cv2.putText(frame, "Total: {} ({} up, {} down)".format(str(total_counter), str(up_count), str(down_count)), (int(0.05 * frame.shape[1]), int(0.1 * frame.shape[0])), 0, 1.5e-3 * frame.shape[0], (0, 255, 255), 2)
-
+      # Draw total count2.
+      cv2.putText(frame, "Total2: {} ({} up, {} down)".format(str(total_counter), str(up_count), str(down_count)), (int(0.65 * frame.shape[1]), int(0.1 * frame.shape[0])), 0, 1.5e-3 * frame.shape[0], (255, 0, 255), 2)
+      
       if show_detections:
         for det in detections:
           bbox = det.to_tlbr()

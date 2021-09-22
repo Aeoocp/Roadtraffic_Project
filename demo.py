@@ -1,6 +1,3 @@
-#! /usr/bin/env python
-# -*- coding: utf-8 -*-
-
 from __future__ import division, print_function, absolute_import
 
 import os
@@ -12,9 +9,9 @@ from PIL import Image
 
 from absl import app, flags, logging
 from absl.flags import FLAGS
-flags.DEFINE_string('text','/content/drive/MyDrive/deepsort_traffic/input_txt/hlp-01-main.txt','input text')
-flags.DEFINE_string('video', '/content/drive/MyDrive/deepsort_traffic/video/hlp-01.mkv', 'path to input video or set to 0 for webcam')
-flags.DEFINE_string('output', None, 'path to output video')
+flags.DEFINE_string('text','/content/Traffic_counting/input_txt/hlp/080841-03.txt','input text')
+flags.DEFINE_string('video', '/content/Traffic_counting/video/hlp/080841-03.mkv', 'path to input video or set to 0 for webcam')
+flags.DEFINE_string('output', '/content/Traffic_counting/output.avi', 'path to output video')
 flags.DEFINE_string('output_format', 'XVID', 'codec used in VideoWriter when saving video to file')
 
 from deep_sort import preprocessing
@@ -24,11 +21,6 @@ from deep_sort.tracker import Tracker
 from tools import generate_detections as gdet
 import imutils.video
 from videocaptureasync import VideoCaptureAsync
-
-from collections import Counter
-from collections import deque 
-import datetime
-import math
 
 warnings.filterwarnings('ignore')
 
@@ -106,7 +98,6 @@ def main(_argv):
         video_capture = VideoCaptureAsync(file_path)
     else:
         video_capture = cv2.VideoCapture(file_path)
-
     
     if asyncVideo_flag:
         video_capture.start()
@@ -119,7 +110,7 @@ def main(_argv):
             w = int(video_capture.get(3))
             h = int(video_capture.get(4))
         fourcc = cv2.VideoWriter_fourcc(*'XVID')
-        out = cv2.VideoWriter('output.avi', fourcc, 30, (w, h))
+        out = cv2.VideoWriter( FLAGS.output , fourcc, 30, (w, h))
         frame_index = -1
 
     fps = 0.0

@@ -1,4 +1,4 @@
-def split_txt(file)
+def split_txt(file):
   file1 = open(file, "r")
   FileContent = file1.read()
   #print(FileContent)

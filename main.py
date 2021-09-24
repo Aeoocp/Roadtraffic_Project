@@ -25,8 +25,7 @@ from videocaptureasync import VideoCaptureAsync
 warnings.filterwarnings('ignore')
 
 def main(_argv):
-  input_T = FLAGS.text
-  file1 = open(file, "r")
+  file1 = open(FLAGS.text, "r")
   FileContent = file1.read()
   AS = FileContent.split()
   

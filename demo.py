@@ -215,6 +215,8 @@ def main(_argv):
           out.release()
 
     cv2.destroyAllWindows()
-
 if __name__ == '__main__':
     try:
+        app.run(main)
+    except SystemExit:
+        pass

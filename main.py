@@ -30,7 +30,6 @@ def main(_argv):
     input_T = FLAGS.text
     file1 = open(input_T, "r")
     FileContent = file1.read()
-#    print(FileContent)
     AS = FileContent.split()
     inform = []
     car_num = []
@@ -46,7 +45,7 @@ def main(_argv):
                 skip = x+3
                 inform.append([])
             elif len(xx) == 2:
-                if xx[1] == 'traffic':
+                if xx[1] != '':
                     y = 1
                     inform[c].append(AS[x]+AS[x+1])
             elif  x > skip:
@@ -76,11 +75,9 @@ def main(_argv):
           ssubbox.append(w)
           ssubbox.append(h)
           subbox.append(ssubbox)
-          classes_s.append(subclass)
-          confidence_s.append(subconfidence)
-          boxes_s.append(subbox)
-    
-    dip = len(boxes_s)//len(inform)
+      classes_s.append(subclass)
+      confidence_s.append(subconfidence)
+      boxes_s.append(subbox)
 
     # Definition of the parameters
     max_cosine_distance = 0.3
@@ -121,79 +118,197 @@ def main(_argv):
 
     fps = 0.0
     fps_imutils = imutils.video.FPS().start()
-    x = 0;
+    current_date = datetime.datetime.now().date()
+    count_dict = {}
 
+    total_counter = 0
+    up_count = 0
+    down_count = 0
+
+    class_counter = Counter()  # store counts of each detected class
+    already_counted = deque(maxlen=50)  # temporary memory for storing counted IDs
+    intersect_info = []  # initialise intersection list
+
+    memory = {}
     while True:
-      print("frame", x)
-      
-      ret, frame = video_capture.read()  # frame shape 640*480*3
+        print("frame", frame_index + 1)
 
-      if ret != True:
+        ret, frame = video_capture.read()  # frame shape 640*480*3
+
+        if ret != True:
         break
-      
-      t1 = time.time()
-      
-      image = Image.fromarray(frame[..., ::-1])  # bgr to rgb
-      #boxes, confidence, classes = yolo.detect_image(image)
-      if x*dip < len(boxes_s):
-        boxes = boxes_s[x*dip]
-        confidence = confidence_s[x*dip]
-        classes = classes_s[x*dip]
-      x = x+1
-      
-      features = encoder(frame, boxes)
-      detections = [Detection(bbox, confidence, cls, feature) for bbox, confidence, cls, feature in
+
+        t1 = time.time()
+
+        image = Image.fromarray(frame[..., ::-1])  # bgr to rgb
+        #boxes, confidence, classes = yolo.detect_image(image)
+        if x < len(boxes_s):
+        boxes = boxes_s[x]
+        confidence = confidence_s[x]
+        classes = classes_s[x]
+        x = x+1
+
+        features = encoder(frame, boxes)
+        detections = [Detection(bbox, confidence, cls, feature) for bbox, confidence, cls, feature in
                       zip(boxes, confidence, classes, features)]
-      # Run non-maxima suppression.
-      boxes = np.array([d.tlwh for d in detections])
-      scores = np.array([d.confidence for d in detections])
-      classes = np.array([d.cls for d in detections])
-      indices = preprocessing.non_max_suppression(boxes, nms_max_overlap, scores)
-      detections = [detections[i] for i in indices]
+        # Run non-maxima suppression.
+        boxes = np.array([d.tlwh for d in detections])
+        scores = np.array([d.confidence for d in detections])
+        classes = np.array([d.cls for d in detections])
+        indices = preprocessing.non_max_suppression(boxes, nms_max_overlap, scores)
+        detections = [detections[i] for i in indices]
 
-      # Call the tracker
-      tracker.predict()
-      tracker.update(detections)
-      
-      line = [(0, int(0.5 * frame.shape[0])), (int(frame.shape[1]), int(0.5 * frame.shape[0]))]
-      cv2.line(frame, line[0], line[1], (0, 255, 255), 2)
+        # Call the tracker
+        tracker.predict()
+        tracker.update(detections)
+        #สร้างและวาดเส้นผ่าน
+        line = [ (int(0.5 * frame.shape[1]), int(0.5 * frame.shape[0])) , (int(frame.shape[1]), int(0.5 * frame.shape[0]) )]
+        cv2.line(frame, line[0], line[1], (0, 255, 255), 2)
 
-      for det in detections:
-        bbox = det.to_tlbr()
-        if show_detections and len(classes) > 0:
-          det_cls = det.cls
-          score = "%.2f" % (det.confidence * 100) + "%"
-          cv2.putText(frame, str(det_cls) + " " + score, (int(bbox[0]), int(bbox[3])), 0, 1e-3 * frame.shape[0], (0, 255, 0), 1)
-          cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (255, 0, 0), 2)
+        for track in tracker.tracks:
+            if not track.is_confirmed() or track.time_since_update > 1:
+                continue
+            bbox = track.to_tlbr()
+            # most common detection class for track
+            track_cls = track.cls 
 
-      for track in tracker.tracks:
-        if not track.is_confirmed() or track.time_since_update > 1:
-          continue
-        bbox = track.to_tlbr()
+            midpoint = track.tlbr_midpoint(bbox)
+            origin_midpoint = (midpoint[0], frame.shape[0] - midpoint[1])  
+            # get midpoint respective to botton-left
 
-        adc = "%.2f" % (track.adc * 100) + "%"  # Average detection confidence
-        cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (255, 255, 255), 2)
-        cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1])), 0, 1e-3 * frame.shape[0], (0, 255, 0), 1)
-        if not show_detections:
-          track_cls = track.cls
-          cv2.putText(frame, str(track_cls), (int(bbox[0]), int(bbox[3])), 0, 1e-3 * frame.shape[0], (0, 255, 0), 1)
-          cv2.putText(frame, 'ADC: ' + adc, (int(bbox[0]), int(bbox[3] + 2e-2 * frame.shape[1])), 0, 1e-3 * frame.shape[0], (0, 255, 0), 1)
-      
-      #cv2.imshow('', frame)
+            if track.track_id not in memory:
+                memory[track.track_id] = deque(maxlen=2)
 
-      if writeVideo_flag:
+            memory[track.track_id].append(midpoint)
+            previous_midpoint = memory[track.track_id][0]
+
+            origin_previous_midpoint = (previous_midpoint[0], frame.shape[0] - previous_midpoint[1])
+
+            cv2.line(frame, midpoint, previous_midpoint, (0, 255, 0), 2)
+
+            # Add to counter and get intersection details
+            A = midpoint
+            B = previous_midpoint
+            C = line[0]
+            D = line[1]
+            ccw1 = (D[1] - A[1]) * (C[0] - A[0]) > (C[1] - A[1]) * (D[0] - A[0])
+            ccw2 = (D[1] - B[1]) * (C[0] - B[0]) > (C[1] - B[1]) * (D[0] - B[0])
+            ccw3 = (C[1] - A[1]) * (B[0] - A[0]) > (B[1] - A[1]) * (C[0] - A[0])
+            ccw4 = (D[1] - A[1]) * (B[0] - A[0]) > (B[1] - A[1]) * (D[0] - A[0])
+
+            if (ccw1 != ccw2 and ccw3 != ccw4) and track.track_id not in already_counted:
+                class_counter[track_cls] += 1
+                total_counter += 1
+                # draw red line
+                cv2.line(frame, line[0], line[1], (0, 0, 255), 2)
+                already_counted.append(track.track_id)  # Set already counted for ID to true.
+                intersection_time = datetime.datetime.now() - datetime.timedelta(microseconds=datetime.datetime.now().microsecond)
+                mx = origin_midpoint[0] - origin_previous_midpoint[0]
+                my = origin_midpoint[1] - origin_previous_midpoint[1]
+                angle = math.degrees(math.atan2(my, mx))
+                intersect_info.append([track_cls, origin_midpoint, angle, intersection_time])
+
+                if angle > 0:
+                    up_count += 1
+                if angle < 0:
+                    down_count += 1
+
+            cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (255, 255, 255), 2)  # WHITE BOX
+            cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1])), 0, 1.5e-3 * frame.shape[0], (0, 255, 0), 2)
+
+            if not show_detections:
+                adc = "%.2f" % (track.adc * 100) + "%"  # Average detection confidence
+                cv2.putText(frame, str(track_cls), (int(bbox[0]), int(bbox[3])), 0, 1e-3 * frame.shape[0], (0, 255, 0), 2)
+                cv2.putText(frame, 'ADC: ' + adc, (int(bbox[0]), int(bbox[3] + 2e-2 * frame.shape[1])), 0, 1e-3 * frame.shape[0], (0, 255, 0), 2)
+
+        # Delete memory of old tracks.
+        # This needs to be larger than the number of tracked objects in the frame.
+        if len(memory) > 50:
+        del memory[list(memory)[0]]
+
+        # Draw total count.
+        cv2.putText(frame, "Total: {} ({} up, {} down)".format(str(total_counter), str(up_count), str(down_count)), (int(0.05 * frame.shape[1]), int(0.1 * frame.shape[0])), 0, 1.5e-3 * frame.shape[0], (0, 255, 255), 2)
+
+        if show_detections:
+            for det in detections:
+                bbox = det.to_tlbr()
+                if show_detections and len(classes) > 0:
+                    det_cls = det.cls
+                    score = "%.2f" % (det.confidence * 100) + "%"
+                    cv2.putText(frame, str(det_cls) + " " + score, (int(bbox[0]), int(bbox[3])), 0, 1e-3 * frame.shape[0], (0, 255, 0), 1)
+                    cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (255, 0, 0), 2)
+        
+        # display counts for each class as they appear
+        my = 0.2 * frame.shape[0]
+        for cls in class_counter:
+            class_count = class_counter[cls]
+            cv2.putText(frame, str(cls) + " " + str(class_count), (int(0.05 * frame.shape[1]), int(my)), 0, 1.5e-3 * frame.shape[0], (0, 255, 255), 2)
+            my += 0.05 * frame.shape[0]
+        
+        # calculate current minute
+        now = datetime.datetime.now()
+        rounded_now = now - datetime.timedelta(microseconds=now.microsecond)  # round to nearest second
+        current_minute = now.time().minute
+        
+        if current_minute == 0 and len(count_dict) > 1:
+            count_dict = {}  # reset counts every hour
+        else:
+            # write counts to file for every set interval of the hour
+            write_interval = 5
+            if current_minute % write_interval == 0:  # write to file once only every write_interval minutes
+                if current_minute not in count_dict:
+                    count_dict[current_minute] = True
+                    total_filename = 'Total counts for {}, {}.txt'.format(current_date, ret)
+                    counts_folder = './counts/'
+                    if not os.access(counts_folder + str(current_date) + '/total', os.W_OK):  
+                        os.makedirs(counts_folder + str(current_date) + '/total')
+                    total_count_file = open(counts_folder + str(current_date) + '/total/' + total_filename, 'a')
+                    print('{} writing...'.format(rounded_now))
+                    print('Writing current total count ({}) and directional counts to file.'.format(total_counter))
+                    total_count_file.write('{}, {}, {}, {}, {}\n'.format(str(rounded_now), "device", str(total_counter), up_count, down_count))
+                    total_count_file.close()
+                    
+                    # if class exists in class counter, create file and write counts
+                    if not os.access(counts_folder + str(current_date) + '/classes', os.W_OK):
+                        os.makedirs(counts_folder + str(current_date) + '/classes')
+                    for cls in class_counter:
+                        class_count = class_counter[cls]
+                        print('Writing current {} count ({}) to file.'.format(cls, class_count))
+                        class_filename = 'Class counts for {}, {}.txt'.format(current_date, ret)
+                        class_count_file = open(counts_folder + str(current_date) + '/classes/' + class_filename, 'a')
+                        class_count_file.write("{}, {}, {}\n".format(rounded_now, "device", str(class_count)))
+                        class_count_file.close()
+                       
+                    # write intersection details
+                    if not os.access(counts_folder + str(current_date) + '/intersections', os.W_OK):
+                        os.makedirs(counts_folder + str(current_date) + '/intersections')
+                    print('Writing intersection details for {}'.format(ret))
+                    intersection_filename = 'Intersection details for {}, {}.txt'.format(current_date, ret)
+                    intersection_file = open(counts_folder + str(current_date) + '/intersections/' + intersection_filename, 'a')
+                    for i in intersect_info:
+                        cls = i[0]
+                        midpoint = i[1]
+                        mx = midpoint[0]
+                        my = midpoint[1]
+                        angle = i[2]
+                        intersect_time = i[3]
+                        intersection_file.write("{}, {}, {}, {}, {}, {}\n".format(str(intersect_time), "device", cls, mx, my, str(angle)))
+                    intersection_file.close()
+                    intersect_info = []  # reset list after writing
+                    
+    if writeVideo_flag:
         # save a frame
         out.write(frame)
         frame_index = frame_index + 1
 
-      fps_imutils.update()
+    fps_imutils.update()
 
-      if not asyncVideo_flag:
+    if not asyncVideo_flag:
         fps = (fps + (1. / (time.time() - t1))) / 2
         #print("FPS = %f" % (fps))
 
-      # Press Q to stop!
-      if cv2.waitKey(1) & 0xFF == ord('q'):
+    # Press Q to stop!
+    if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
     fps_imutils.stop()
@@ -208,6 +323,8 @@ def main(_argv):
           out.release()
 
     cv2.destroyAllWindows()
+    
+    
 if __name__ == '__main__':
     try:
         app.run(main)

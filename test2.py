@@ -272,7 +272,7 @@ def main(_argv):
         if current_minute % write_interval == 0:  # write to file once only every write_interval minutes
           if current_minute not in count_dict:
             count_dict[current_minute] = True
-            total_filename = 'Total counts for {}, {}.txt'.format(current_date, cam_id)
+            total_filename = 'Total counts for {}, {}.txt'.format(current_date, ret)
             counts_folder = './counts/'
             if not os.access(counts_folder + str(current_date) + '/total', os.W_OK):
               os.makedirs(counts_folder + str(current_date) + '/total')
@@ -290,7 +290,7 @@ def main(_argv):
             for cls in class_counter:
               class_count = class_counter[cls]
               print('Writing current {} count ({}) to file.'.format(cls, class_count))
-              class_filename = 'Class counts for {}, {}.txt'.format(current_date, cam_id)
+              class_filename = 'Class counts for {}, {}.txt'.format(current_date, ret)
               class_count_file = open(counts_folder + str(current_date) + '/classes/' + class_filename, 'a')
               class_count_file.write("{}, {}, {}\n".format(rounded_now, device, str(class_count)))
               class_count_file.close()
@@ -298,8 +298,8 @@ def main(_argv):
             # write intersection details
             if not os.access(counts_folder + str(current_date) + '/intersections', os.W_OK):
               os.makedirs(counts_folder + str(current_date) + '/intersections')
-            print('Writing intersection details for {}'.format(cam_id))
-            intersection_filename = 'Intersection details for {}, {}.txt'.format(current_date, cam_id)
+            print('Writing intersection details for {}'.format(ret))
+            intersection_filename = 'Intersection details for {}, {}.txt'.format(current_date, ret)
             intersection_file = open(counts_folder + str(current_date) + '/intersections/' + intersection_filename, 'a')
             for i in intersect_info:
               cls = i[0]

@@ -176,7 +176,7 @@ def main(_argv):
           cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1])), 0, 1.5e-3 * frame.shape[0], (0, 255, 0), 2)
           cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (255, 0, 0), 2)  # 
           if len(classes) > 0:
-          det_cls = det.cls
+            det_cls = det.cls
           if det_cls == "car":
             cv2.putText(frame, str(det_cls), (int(bbox[0]), int(bbox[3])), 0, 1.5e-3 * frame.shape[0], (0, 255, 0), 2)
           else:

@@ -169,18 +169,6 @@ def main(_argv):
       frameX = frame.shape[1] #640
       line = [(int(0.5 * frameX), int(0.5 * frameY)), (int(0.8 * frameX), int(0.5 * frameY))]
       cv2.line(frame, line[0], line[1], (0, 255, 255), 2)   #(image, start_point, end_point, color, thickness)
-      
-      if show_detections:
-        for det in detections:
-          bbox = det.to_tlbr()
-          cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1])), 0, 1.5e-3 * frame.shape[0], (0, 255, 0), 2)
-          cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (255, 0, 0), 2)  # 
-          if len(classes) > 0:
-            det_cls = det.cls
-          if det_cls == "car":
-            cv2.putText(frame, str(det_cls), (int(bbox[0]), int(bbox[3])), 0, 1.5e-3 * frame.shape[0], (0, 255, 0), 2)
-          else:
-            cv2.putText(frame, str(det_cls), (int(bbox[0]), int(bbox[3])), 0, 1.5e-3 * frame.shape[0], (0, 0, 255), 2)
             
       for track in tracker.tracks:
         if not track.is_confirmed() or track.time_since_update > 1:
@@ -251,6 +239,18 @@ def main(_argv):
                   str(down_count)), (int(0.05 * frame.shape[1]), int(0.1 * frame.shape[0])), 0,
                   1.5e-3 * frame.shape[0], (0, 255, 255), 2)
       
+      if show_detections:
+        for det in detections:
+          bbox = det.to_tlbr()
+          cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1])), 0, 1.5e-3 * frame.shape[0], (0, 255, 0), 2)
+          cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (255, 0, 0), 2)  # 
+          if len(classes) > 0:
+            det_cls = det.cls
+          if det_cls == "car":
+            cv2.putText(frame, str(det_cls), (int(bbox[0]), int(bbox[3])), 0, 1.5e-3 * frame.shape[0], (0, 255, 0), 2)
+          else:
+            cv2.putText(frame, str(det_cls), (int(bbox[0]), int(bbox[3])), 0, 1.5e-3 * frame.shape[0], (0, 0, 255), 2)
+            
       # display counts for each class as they appear
       y = 0.2 * frame.shape[0]
       for cls in class_counter:

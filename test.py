@@ -121,6 +121,8 @@ def main(_argv):
   fps = 0.0
   fps_imutils = imutils.video.FPS().start()
   x = 0;
+  current_date = datetime.datetime.now().date()
+  count_dict = {}
   
   total_counter = 0
   up_count = 0

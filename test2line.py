@@ -248,9 +248,9 @@ def main(_argv):
         del memory[list(memory)[0]]
 
     # Draw total count.
-    cv2.putText(frame, "Total: " + total_counter , (int(0.8 * frame.shape[1]), int(0.1 * frame.shape[0])), 0,
+    cv2.putText(frame, "Total: {}".format(str(total_counter)), (int(0.8 * frame.shape[1]), int(0.1 * frame.shape[0])), 0,
                 1.5e-3 * frame.shape[0], (0, 255, 255), 2)
-    cv2.putText(frame, "Total: " + total_counter2 , (int(0.05 * frame.shape[1]), int(0.1 * frame.shape[0])), 0,
+    cv2.putText(frame, "Total: {}".format(str(total_counter2)), (int(0.05 * frame.shape[1]), int(0.1 * frame.shape[0])), 0,
                 1.5e-3 * frame.shape[0], (0, 255, 255), 2)
 
     if show_detections:
@@ -335,7 +335,7 @@ def main(_argv):
             x = midpoint[0]
             y = midpoint[1]
             intersect_time = i[2]
-            intersection_file.write("{}, {}, {}, {}, {}, {}\n".format(str(intersect_time), "device", cls,                                                   x, y, str(angle)))
+            intersection_file.write("{}, {}, {}, {}, {}\n".format(str(intersect_time), "device", cls, x, y))
           intersection_file.close()
           intersect_info = []  # reset list after writing
           
@@ -345,7 +345,7 @@ def main(_argv):
             x = midpoint[0]
             y = midpoint[1]
             intersect_time = i[2]
-            intersection_file.write("{}, {}, {}, {}, {}, {}\n".format(str(intersect_time), "device", cls,                                                   x, y, str(angle)))
+            intersection_file.write("{}, {}, {}, {}, {}\n".format(str(intersect_time), "device", cls, x, y))
           intersection_file.close()
           intersect_info2 = []  # reset list after writing
 

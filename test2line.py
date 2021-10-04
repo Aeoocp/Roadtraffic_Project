@@ -115,7 +115,7 @@ def main(_argv):
       w = int(video_capture.get(3))
       h = int(video_capture.get(4))
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    out = cv2.VideoWriter('output.avi', fourcc, 30, (w, h))
+    out = cv2.VideoWriter('output_2line.avi', fourcc, 30, (w, h))
     frame_index = -1
 
   fps = 0.0
@@ -168,9 +168,9 @@ def main(_argv):
     #สร้างและวาดเส้นผ่าน
     frameY = frame.shape[0] #360
     frameX = frame.shape[1] #640
-    line = [(int(0.5 * frameX), int(0.5 * frameY)), (int(0.8 * frameX), int(0.5 * frameY))]
+    line = [(int(0.3 * frameX), int(0.9 * frameY)), (int(0.65 * frameX), int(0.9 * frameY))]
     cv2.line(frame, line[0], line[1], (0, 255, 255), 2)   #(image, start_point, end_point, color, thickness)
-    line2 = [(int(0.5 * frameX), int(0.5 * frameY)), (int(0.8 * frameX), int(0.5 * frameY))]
+    line2 = [(int(0.1 * frameX), int(0.25 * frameY)), (int(0.2 * frameX), int(0.25 * frameY))]
     cv2.line(frame, line2[0], line2[1], (255, 255, 0), 2)   #(image, start_point, end_point, color, thickness)
     
     

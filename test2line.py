@@ -168,9 +168,9 @@ def main(_argv):
     #สร้างและวาดเส้นผ่าน
     frameY = frame.shape[0] #360
     frameX = frame.shape[1] #640
-    line = [(int(0.3 * frameX), int(0.9 * frameY)), (int(0.65 * frameX), int(0.9 * frameY))]
+    line = [(int(0.4 * frameX), int(0.7 * frameY)), (int(0.65 * frameX), int(0.7 * frameY))]
     cv2.line(frame, line[0], line[1], (0, 255, 255), 2)   #(image, start_point, end_point, color, thickness)
-    line2 = [(int(0.1 * frameX), int(0.25 * frameY)), (int(0.2 * frameX), int(0.25 * frameY))]
+    line2 = [(int(0.05 * frameX), int(0.6 * frameY)), (int(0.15 * frameX), int(0.65 * frameY))]
     cv2.line(frame, line2[0], line2[1], (255, 255, 0), 2)   #(image, start_point, end_point, color, thickness)
     
     
@@ -274,7 +274,7 @@ def main(_argv):
       y += 0.05 * frame.shape[0]
     for cls in class_counter2:
       class_count2 = class_counter[cls]
-      cv2.putText(frame, str(cls) + " " + str(class_count), (int(0.05 * frame.shape[1]), int(y)), 0,
+      cv2.putText(frame, str(cls) + " " + str(class_count2), (int(0.05 * frame.shape[1]), int(y)), 0,
                   1.5e-3 * frame.shape[0], (0, 255, 255), 2)
       y += 0.05 * frame.shape[0]
       
@@ -339,6 +339,7 @@ def main(_argv):
           intersection_file.close()
           intersect_info = []  # reset list after writing
           
+          intersection_file = open(counts_folder + str(current_date) + '/intersections/' + intersection_filename, 'a')
           for i in intersect_info2:
             cls = i[0]
             midpoint = i[1]

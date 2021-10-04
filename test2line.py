@@ -120,7 +120,7 @@ def main(_argv):
 
   fps = 0.0
   fps_imutils = imutils.video.FPS().start()
-  x = 0;
+  frame_num = 0;
   current_date = datetime.datetime.now().date()
   count_dict = {}
   
@@ -135,7 +135,7 @@ def main(_argv):
     
   memory = {}
   while True:
-    print("frame", x)
+    print("frame", frame_num)
 
     ret, frame = video_capture.read()  # frame shape 640*480*3
 

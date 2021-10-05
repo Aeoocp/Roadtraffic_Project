@@ -146,11 +146,11 @@ def main(_argv):
     t1 = time.time()
 
     image = Image.fromarray(frame[..., ::-1])  # bgr to rgb
-    if x < len(boxes_s):
-      boxes = boxes_s[x]
-      confidence = confidence_s[x]
-      classes = classes_s[x]
-    x = x + 1
+    if frame_num < len(boxes_s):
+      boxes = boxes_s[frame_num]
+      confidence = confidence_s[frame_num]
+      classes = classes_s[frame_num]
+    frame_num = frame_num + 1
 
     features = encoder(frame, boxes)
     detections = [Detection(bbox, confidence, cls, feature) for bbox, confidence, cls, feature in

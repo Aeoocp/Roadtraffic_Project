@@ -268,16 +268,17 @@ def main(_argv):
 
     # display counts for each class as they appear
     y = 0.2 * frame.shape[0]
+    y2 = 0.2 * frame.shape[0]
     for cls in class_counter:
       class_count = class_counter[cls]
       cv2.putText(frame, str(cls) + " " + str(class_count), (int(0.8 * frame.shape[1]), int(y)), 0,
                   1.5e-3 * frame.shape[0], (0, 255, 255), 2)
       y += 0.05 * frame.shape[0]
     for cls in class_counter2:
-      class_count2 = class_counter[cls]
-      cv2.putText(frame, str(cls) + " " + str(class_count2), (int(0.05 * frame.shape[1]), int(y)), 0,
+      class_count2 = class_counter2[cls]
+      cv2.putText(frame, str(cls) + " " + str(class_count2), (int(0.05 * frame.shape[1]), int(y2)), 0,
                   1.5e-3 * frame.shape[0], (0, 255, 255), 2)
-      y += 0.05 * frame.shape[0]
+      y2 += 0.05 * frame.shape[0]
       
 
     # calculate current minute

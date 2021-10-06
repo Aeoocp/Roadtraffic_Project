@@ -125,47 +125,47 @@ def main(_argv):
       break
 
     t1 = time.time()
+    if(frame_index%2 == 0):
+      image = Image.fromarray(frame[..., ::-1])  # bgr to rgb
+      if frame_index+1 < len(boxes_s):
+        boxes = boxes_s[frame_index+1]
+        confidence = confidence_s[frame_index+1]
+        classes = classes_s[frame_index+1]
 
-    image = Image.fromarray(frame[..., ::-1])  # bgr to rgb
-    if frame_index+1 < len(boxes_s):
-      boxes = boxes_s[frame_index+1]
-      confidence = confidence_s[frame_index+1]
-      classes = classes_s[frame_index+1]
+      features = encoder(frame, boxes)
+      detections = [Detection(bbox, confidence, cls, feature) for bbox, confidence, cls, feature in
+                      zip(boxes, confidence, classes, features)]
+      # Run non-maxima suppression.
+      boxes = np.array([d.tlwh for d in detections])
+      scores = np.array([d.confidence for d in detections])
+      classes = np.array([d.cls for d in detections])
+      indices = preprocessing.non_max_suppression(boxes, nms_max_overlap, scores)
+      detections = [detections[i] for i in indices]
 
-    features = encoder(frame, boxes)
-    detections = [Detection(bbox, confidence, cls, feature) for bbox, confidence, cls, feature in
-                    zip(boxes, confidence, classes, features)]
-    # Run non-maxima suppression.
-    boxes = np.array([d.tlwh for d in detections])
-    scores = np.array([d.confidence for d in detections])
-    classes = np.array([d.cls for d in detections])
-    indices = preprocessing.non_max_suppression(boxes, nms_max_overlap, scores)
-    detections = [detections[i] for i in indices]
+      # Call the tracker
+      tracker.predict()
+      tracker.update(detections)
 
-    # Call the tracker
-    tracker.predict()
-    tracker.update(detections)
+      for det in detections:
+        bbox = det.to_tlbr()
+        if show_detections and len(classes) > 0:
+          det_cls = det.cls
+          score = "%.2f" % (det.confidence * 100) + "%"
+          cv2.putText(frame, str(det_cls) + " " + score, (int(bbox[0]), int(bbox[3])), 0, 1e-3 * frame.shape[0], (0, 255, 0), 1)
+          cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (255, 0, 0), 2)
 
-    for det in detections:
-      bbox = det.to_tlbr()
-      if show_detections and len(classes) > 0:
-        det_cls = det.cls
-        score = "%.2f" % (det.confidence * 100) + "%"
-        cv2.putText(frame, str(det_cls) + " " + score, (int(bbox[0]), int(bbox[3])), 0, 1e-3 * frame.shape[0], (0, 255, 0), 1)
-        cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (255, 0, 0), 2)
+      for track in tracker.tracks:
+        if not track.is_confirmed() or track.time_since_update > 1:
+          continue
+        bbox = track.to_tlbr()
 
-    for track in tracker.tracks:
-      if not track.is_confirmed() or track.time_since_update > 1:
-        continue
-      bbox = track.to_tlbr()
-
-      adc = "%.2f" % (track.adc * 100) + "%"  # Average detection confidence
-      cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (255, 255, 255), 2)
-      cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1])), 0, 1e-3 * frame.shape[0], (0, 255, 0), 1)
-      if not show_detections:
-        track_cls = track.cls
-        cv2.putText(frame, str(track_cls), (int(bbox[0]), int(bbox[3])), 0, 1e-3 * frame.shape[0], (0, 255, 0), 1)
-        cv2.putText(frame, 'ADC: ' + adc, (int(bbox[0]), int(bbox[3] + 2e-2 * frame.shape[1])), 0, 1e-3 * frame.shape[0], (0, 255, 0), 1)
+        adc = "%.2f" % (track.adc * 100) + "%"  # Average detection confidence
+        cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (255, 255, 255), 2)
+        cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1])), 0, 1e-3 * frame.shape[0], (0, 255, 0), 1)
+        if not show_detections:
+          track_cls = track.cls
+          cv2.putText(frame, str(track_cls), (int(bbox[0]), int(bbox[3])), 0, 1e-3 * frame.shape[0], (0, 255, 0), 1)
+          cv2.putText(frame, 'ADC: ' + adc, (int(bbox[0]), int(bbox[3] + 2e-2 * frame.shape[1])), 0, 1e-3 * frame.shape[0], (0, 255, 0), 1)
 
     if writeVideo_flag:
         # save a frame

@@ -133,7 +133,7 @@ def main(_argv):
       track_cls = track.cls
       
       if track_cls == "car":
-        cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (0, 255, 0)), 2)
+        cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (0, 255, 0), 2)
         cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1])), 0, 1.5e-3 * frame.shape[0], (0, 255, 0), 1)
         cv2.putText(frame, str(track_cls), (int(bbox[0]), int(bbox[3])), 0, 1e-3 * frame.shape[0], (0, 255, 0), 1)
       elif track_cls == "truck":
@@ -189,9 +189,9 @@ def main(_argv):
 
     # Draw total count.
     cv2.putText(frame, "Total: {}".format(str(total_counter)), (int(0.8 * frame.shape[1]), int(0.1 * frame.shape[0])), 0,
-                1.5e-3 * frame.shape[0], (255, 255, 255), 2)
+                1.5e-3 * frame.shape[0], (0, 255, 255), 2)
     cv2.putText(frame, "Total2: {}".format(str(total_counter2)), (int(0.05 * frame.shape[1]), int(0.1 * frame.shape[0])), 0,
-                  1.5e-3 * frame.shape[0], (255, 255, 255), 2)
+                  1.5e-3 * frame.shape[0], (0, 255, 255), 2)
     
     # display counts for each class as they appear
     y = 0.2 * frame.shape[0]
@@ -204,7 +204,7 @@ def main(_argv):
     for cls in class_counter2:
       class_count2 = class_counter2[cls]
       cv2.putText(frame, str(cls) + " " + str(class_count2), (int(0.05 * frame.shape[1]), int(y2)), 0,
-                  1.5e-3 * frame.shape[0], (255, 0, 0), 2)
+                  1.5e-3 * frame.shape[0], (0, 255, 255), 2)
       y2 += 0.05 * frame.shape[0]
         
     if writeVideo_flag:

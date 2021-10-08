@@ -134,6 +134,7 @@ def main(_argv):
     
   memory = {}
   memory2 = {}
+  maxId = 0
   while True:
     print("frame", frame_index+1)
 
@@ -255,15 +256,16 @@ def main(_argv):
       if show_detections:
         for det in detections:
           bbox = det.to_tlbr() # min x, min y, max x, max y
-          cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (255, 0, 0), 2)  # 
           if len(classes) > 0:
             det_cls = det.cls
             if det_cls == "car":
               cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1])), 0, 1.5e-3 * frame.shape[0], (0, 255, 0), 2)
               cv2.putText(frame, str(det_cls), (int(bbox[0]), int(bbox[3])), 0, 1.5e-3 * frame.shape[0], (0, 255, 0), 2)
             else:
-              cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1]+10)), 0, 1.5e-3 * frame.shape[0], (0, 0, 255), 2)
+              cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1]-25)), 0, 1.5e-3 * frame.shape[0], (0, 0, 255), 2)
               cv2.putText(frame, str(det_cls), (int(bbox[0]), int(bbox[3])), 0, 1.5e-3 * frame.shape[0], (0, 0, 255), 2)
+            if track.track_id > maxId:
+              maxId = track.track_id
 
       # display counts for each class as they appear
       y = 0.2 * frame.shape[0]
@@ -367,6 +369,7 @@ def main(_argv):
 
   fps_imutils.stop()
   print('imutils FPS: {}'.format(fps_imutils.fps()))
+  print("maxId", maxId)
 
   if asyncVideo_flag:
     video_capture.stop()

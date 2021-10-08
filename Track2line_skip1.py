@@ -147,16 +147,16 @@ def main(_argv):
         cv2.putText(frame, str(track_cls), (int(bbox[0]), int(bbox[3])), 0, 1e-3 * frame.shape[0], (255, 0, 0), 1)
 
       midpoint = track.tlbr_midpoint(bbox)
-      # get midpoint respective to botton-left
+      # เก็บจุดกลางล่างต้นทาง? 
       origin_midpoint = (midpoint[0], frame.shape[0] - midpoint[1])
-      print("midpoint",midpoint)
-      print("frame.shape[0]",frame.shape[0]
-      print("origin_midpoint",origin_midpoint)
 
       if track.track_id not in memory:
         memory[track.track_id] = deque(maxlen=2)  
 
       memory[track.track_id].append(midpoint)
+      print("frame", frame_index+1)
+      print("track.track_id",track.track_id)
+      print(" memory[track.track_id]", memory[track.track_id])
       previous_midpoint = memory[track.track_id][0]
       origin_previous_midpoint = (previous_midpoint[0], frame.shape[0] - previous_midpoint[1])
 

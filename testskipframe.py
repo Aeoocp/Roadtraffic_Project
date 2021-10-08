@@ -149,31 +149,30 @@ def main(_argv):
       boxes = boxes_s[frame_index+1]
       confidence = confidence_s[frame_index+1]
       classes = classes_s[frame_index+1]
-    
+   
+    features = encoder(frame, boxes)
+    detections = [Detection(bbox, confidence, cls, feature) for bbox, confidence, cls, feature in
+                    zip(boxes, confidence, classes, features)]
+    # Run non-maxima suppression.
+    boxes = np.array([d.tlwh for d in detections])
+    scores = np.array([d.confidence for d in detections])
+    classes = np.array([d.cls for d in detections])
+    indices = preprocessing.non_max_suppression(boxes, nms_max_overlap, scores)
+    detections = [detections[i] for i in indices]
+
+    # Call the tracker
+    tracker.predict()
+    tracker.update(detections)
+
+    #สร้างและวาดเส้นผ่าน
+    frameY = frame.shape[0] #360
+    frameX = frame.shape[1] #640
+    line = [(int(0.3 * frameX), int(0.8 * frameY)), (int(0.55 * frameX), int(0.85 * frameY))]
+    cv2.line(frame, line[0], line[1], (0, 255, 255), 2)   #(image, start_point, end_point, color, thickness)
+    line2 = [(int(0.05 * frameX), int(0.6 * frameY)), (int(0.2 * frameX), int(0.65 * frameY))]
+    cv2.line(frame, line2[0], line2[1], (255, 0, 0), 2)   #(image, start_point, end_point, color, thickness)
+
     if (frame_index+1 % 2 == 0):
-      features = encoder(frame, boxes)
-      detections = [Detection(bbox, confidence, cls, feature) for bbox, confidence, cls, feature in
-                      zip(boxes, confidence, classes, features)]
-      # Run non-maxima suppression.
-      boxes = np.array([d.tlwh for d in detections])
-      scores = np.array([d.confidence for d in detections])
-      classes = np.array([d.cls for d in detections])
-      indices = preprocessing.non_max_suppression(boxes, nms_max_overlap, scores)
-      detections = [detections[i] for i in indices]
-
-      # Call the tracker
-      tracker.predict()
-      tracker.update(detections)
-
-      #สร้างและวาดเส้นผ่าน
-      frameY = frame.shape[0] #360
-      frameX = frame.shape[1] #640
-      line = [(int(0.3 * frameX), int(0.8 * frameY)), (int(0.55 * frameX), int(0.85 * frameY))]
-      cv2.line(frame, line[0], line[1], (0, 255, 255), 2)   #(image, start_point, end_point, color, thickness)
-      line2 = [(int(0.05 * frameX), int(0.6 * frameY)), (int(0.2 * frameX), int(0.65 * frameY))]
-      cv2.line(frame, line2[0], line2[1], (255, 0, 0), 2)   #(image, start_point, end_point, color, thickness)
-
-
       for track in tracker.tracks:
         if not track.is_confirmed() or track.time_since_update > 1:
           continue

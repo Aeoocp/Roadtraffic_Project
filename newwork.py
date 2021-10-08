@@ -20,6 +20,7 @@ from deep_sort.detection import Detection
 from deep_sort.tracker import Tracker
 from tools import generate_detections as gdet
 from tools import splitFile
+from tools import CheckCrossLine
 import imutils.video
 from videocaptureasync import VideoCaptureAsync
 
@@ -32,9 +33,7 @@ warnings.filterwarnings('ignore')
 
 def main(_argv):
   classes_s,confidence_s,boxes_s = splitFile.spilttxt(FLAGS.text)
-  print("classes_s",classes_s)
-  print("confidence_s",confidence_s)
-  print("boxes_s",boxes_s)
+  
   # Definition of the parameters
   max_cosine_distance = 0.3
   nn_budget = None
@@ -154,11 +153,37 @@ def main(_argv):
 
       memory[track.track_id].append(midpoint)
       previous_midpoint = memory[track.track_id][0]
-
       origin_previous_midpoint = (previous_midpoint[0], frame.shape[0] - previous_midpoint[1])
 
       cv2.line(frame, midpoint, previous_midpoint, (0, 255, 0), 2)
+      
+      TC = CheckCrossLine(midpoint, previous_midpoint, line[0] ,line[1])
+      if TC and (track.track_id not in already_counted):
+        class_counter[track_cls] += 1
+        total_counter += 1
+        # draw red line
+        cv2.line(frame, line[0], line[1], (0, 0, 255), 2)
+        already_counted.append(track.track_id)  # Set already counted for ID to true.
+        intersection_time = datetime.datetime.now() - datetime.timedelta(microseconds=datetime.datetime.now().microsecond)
+        intersect_info.append([track_cls, origin_midpoint, intersection_time])
         
+    # Delete memory of old tracks.
+    # This needs to be larger than the number of tracked objects in the frame.  
+    if len(memory) > 50:
+      del memory[list(memory)[0]]
+
+    # Draw total count.
+    cv2.putText(frame, "Total: {}".format(str(total_counter)), (int(0.8 * frame.shape[1]), int(0.1 * frame.shape[0])), 0,
+                1.5e-3 * frame.shape[0], (0, 255, 255), 2)
+    
+    # display counts for each class as they appear
+    y = 0.2 * frame.shape[0]
+    y2 = 0.2 * frame.shape[0]
+    for cls in class_counter:
+      class_count = class_counter[cls]
+      cv2.putText(frame, str(cls) + " " + str(class_count), (int(0.8 * frame.shape[1]), int(y)), 0,
+                  1.5e-3 * frame.shape[0], (0, 255, 255), 2)
+      y += 0.05 * frame.shape[0]
         
     if writeVideo_flag:
         # save a frame

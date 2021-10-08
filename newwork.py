@@ -156,8 +156,8 @@ def main(_argv):
         cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1])), 0, 1.5e-3 * frame.shape[0], (0, 255, 0), 1)
         cv2.putText(frame, str(track_cls), (int(bbox[0]), int(bbox[3])), 0, 1e-3 * frame.shape[0], (0, 255, 0), 1)
       elif track_cls == "truck":
-        cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (0, 0, 255), 2)
-        cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1])), 0, 1.5e-3 * frame.shape[0], (0, 0, 255), 1)
+        cv2.rectangle(frame, (int(bbox[0]+5), int(bbox[1]+5)), (int(bbox[2]+5), int(bbox[3]+5)), (0, 0, 255), 2)
+        cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1]-25)), 0, 1.5e-3 * frame.shape[0], (0, 0, 255), 1)
         cv2.putText(frame, str(track_cls), (int(bbox[0]), int(bbox[3])), 0, 1e-3 * frame.shape[0], (0, 0, 255), 1)
       else:
         cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (255, 0, 0), 2)

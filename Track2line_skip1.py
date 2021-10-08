@@ -126,7 +126,6 @@ def main(_argv):
     line2 = [(int(0.05 * frameX), int(0.6 * frameY)), (int(0.2 * frameX), int(0.65 * frameY))]
     cv2.line(frame, line2[0], line2[1], (255, 255, 255), 2)   #(image, start_point, end_point, color, thickness)
     
-
     for track in tracker.tracks:
       if not track.is_confirmed() or track.time_since_update > 1:
         continue
@@ -151,12 +150,11 @@ def main(_argv):
       origin_midpoint = (midpoint[0], frame.shape[0] - midpoint[1])
 
       if track.track_id not in memory:
-        memory[track.track_id] = deque(maxlen=2)  
+        memory[track.track_id] = deque(maxlen=3)  
 
       memory[track.track_id].append(midpoint)
-      print("frame", frame_index+1)
-      print("track.track_id",track.track_id)
-      print(" memory[track.track_id]", memory[track.track_id])
+      if track.track_id == 9:
+        print("memory[track.track_id]",memory[track.track_id])
       previous_midpoint = memory[track.track_id][0]
       origin_previous_midpoint = (previous_midpoint[0], frame.shape[0] - previous_midpoint[1])
 

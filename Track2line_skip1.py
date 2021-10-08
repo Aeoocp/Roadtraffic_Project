@@ -114,7 +114,6 @@ def main(_argv):
     indices = preprocessing.non_max_suppression(boxes, nms_max_overlap, scores)
     detections = [detections[i] for i in indices]
 
-    
     # Call the tracker
     tracker.predict()
     tracker.update(detections)
@@ -150,6 +149,9 @@ def main(_argv):
       midpoint = track.tlbr_midpoint(bbox)
       # get midpoint respective to botton-left
       origin_midpoint = (midpoint[0], frame.shape[0] - midpoint[1])
+      print("midpoint",midpoint)
+      print("frame.shape[0]",frame.shape[0]
+      print("origin_midpoint",origin_midpoint)
 
       if track.track_id not in memory:
         memory[track.track_id] = deque(maxlen=2)  

@@ -120,7 +120,6 @@ def main(_argv):
 
   fps = 0.0
   fps_imutils = imutils.video.FPS().start()
-  frame_num = 0;
   current_date = datetime.datetime.now().date()
   count_dict = {}
   
@@ -136,7 +135,7 @@ def main(_argv):
   memory = {}
   memory2 = {}
   while True:
-    print("frame", frame_num)
+    print("frame", frame_index+1)
 
     ret, frame = video_capture.read()  # frame shape 640*480*3
 
@@ -146,95 +145,95 @@ def main(_argv):
     t1 = time.time()
 
     image = Image.fromarray(frame[..., ::-1])  # bgr to rgb
-    if frame_num < len(boxes_s):
-      boxes = boxes_s[frame_num]
-      confidence = confidence_s[frame_num]
-      classes = classes_s[frame_num]
-    frame_num = frame_num + 1
-
-    features = encoder(frame, boxes)
-    detections = [Detection(bbox, confidence, cls, feature) for bbox, confidence, cls, feature in
-                    zip(boxes, confidence, classes, features)]
-    # Run non-maxima suppression.
-    boxes = np.array([d.tlwh for d in detections])
-    scores = np.array([d.confidence for d in detections])
-    classes = np.array([d.cls for d in detections])
-    indices = preprocessing.non_max_suppression(boxes, nms_max_overlap, scores)
-    detections = [detections[i] for i in indices]
-
-    # Call the tracker
-    tracker.predict()
-    tracker.update(detections)
-
-    #สร้างและวาดเส้นผ่าน
-    frameY = frame.shape[0] #360
-    frameX = frame.shape[1] #640
-    line = [(int(0.3 * frameX), int(0.8 * frameY)), (int(0.55 * frameX), int(0.85 * frameY))]
-    cv2.line(frame, line[0], line[1], (0, 255, 255), 2)   #(image, start_point, end_point, color, thickness)
-    line2 = [(int(0.05 * frameX), int(0.6 * frameY)), (int(0.2 * frameX), int(0.65 * frameY))]
-    cv2.line(frame, line2[0], line2[1], (255, 0, 0), 2)   #(image, start_point, end_point, color, thickness)
+    if frame_index+1 < len(boxes_s):
+      boxes = boxes_s[frame_index+1]
+      confidence = confidence_s[frame_index+1]
+      classes = classes_s[frame_index+1]
     
-    
-    for track in tracker.tracks:
-      if not track.is_confirmed() or track.time_since_update > 1:
-        continue
-      bbox = track.to_tlbr()
-      # most common detection class for track
-      track_cls = track.cls
-      
-      midpoint = track.tlbr_midpoint(bbox)
-      origin_midpoint = (midpoint[0], frame.shape[0] - midpoint[1])  
-      # get midpoint respective to botton-left
-      
-      if track.track_id not in memory:
-        memory[track.track_id] = deque(maxlen=2)  
-    
-      memory[track.track_id].append(midpoint)
-      previous_midpoint = memory[track.track_id][0]
-     
-      origin_previous_midpoint = (previous_midpoint[0], frame.shape[0] - previous_midpoint[1])
+    if (frame_index+1 % 2 == 0):
+      features = encoder(frame, boxes)
+      detections = [Detection(bbox, confidence, cls, feature) for bbox, confidence, cls, feature in
+                      zip(boxes, confidence, classes, features)]
+      # Run non-maxima suppression.
+      boxes = np.array([d.tlwh for d in detections])
+      scores = np.array([d.confidence for d in detections])
+      classes = np.array([d.cls for d in detections])
+      indices = preprocessing.non_max_suppression(boxes, nms_max_overlap, scores)
+      detections = [detections[i] for i in indices]
 
-      cv2.line(frame, midpoint, previous_midpoint, (0, 255, 0), 2)
-      
-      # Add to counter and get intersection details
-      A = midpoint
-      B = previous_midpoint
-      C = line[0]
-      D = line[1]
-      ccw1 = (D[1] - A[1]) * (C[0] - A[0]) > (C[1] - A[1]) * (D[0] - A[0])
-      ccw2 = (D[1] - B[1]) * (C[0] - B[0]) > (C[1] - B[1]) * (D[0] - B[0])
-      ccw3 = (C[1] - A[1]) * (B[0] - A[0]) > (B[1] - A[1]) * (C[0] - A[0])
-      ccw4 = (D[1] - A[1]) * (B[0] - A[0]) > (B[1] - A[1]) * (D[0] - A[0])
-      
-      CC = line2[0]
-      DD = line2[1]
-      ccw5 = (DD[1] - A[1]) * (CC[0] - A[0]) > (CC[1] - A[1]) * (DD[0] - A[0])
-      ccw6 = (DD[1] - B[1]) * (CC[0] - B[0]) > (CC[1] - B[1]) * (DD[0] - B[0])
-      ccw7 = (CC[1] - A[1]) * (B[0] - A[0]) > (B[1] - A[1]) * (CC[0] - A[0])
-      ccw8 = (DD[1] - A[1]) * (B[0] - A[0]) > (B[1] - A[1]) * (DD[0] - A[0])
+      # Call the tracker
+      tracker.predict()
+      tracker.update(detections)
 
-      if (ccw1 != ccw2 and ccw3 != ccw4) and track.track_id not in already_counted:
-        class_counter[track_cls] += 1
-        total_counter += 1
-        # draw red line
-        cv2.line(frame, line[0], line[1], (0, 0, 255), 2)
-        already_counted.append(track.track_id)  # Set already counted for ID to true.
-        intersection_time = datetime.datetime.now() - datetime.timedelta(microseconds=datetime.datetime.now().microsecond)
-        intersect_info.append([track_cls, origin_midpoint, intersection_time])
-        
-      elif (ccw5 != ccw6 and ccw7 != ccw8) and track.track_id not in already_counted:
-        class_counter2[track_cls] += 1
-        total_counter2 += 1
-        # draw red line
-        cv2.line(frame, line2[0], line2[1], (0, 0, 255), 2)
-        already_counted.append(track.track_id)  # Set already counted for ID to true.
-        intersection_time = datetime.datetime.now() - datetime.timedelta(microseconds=datetime.datetime.now().microsecond)
-        intersect_info2.append([track_cls, origin_midpoint, intersection_time])
+      #สร้างและวาดเส้นผ่าน
+      frameY = frame.shape[0] #360
+      frameX = frame.shape[1] #640
+      line = [(int(0.3 * frameX), int(0.8 * frameY)), (int(0.55 * frameX), int(0.85 * frameY))]
+      cv2.line(frame, line[0], line[1], (0, 255, 255), 2)   #(image, start_point, end_point, color, thickness)
+      line2 = [(int(0.05 * frameX), int(0.6 * frameY)), (int(0.2 * frameX), int(0.65 * frameY))]
+      cv2.line(frame, line2[0], line2[1], (255, 0, 0), 2)   #(image, start_point, end_point, color, thickness)
 
 
-      cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (255, 255, 255), 2)  # WHITE BOX
-      cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1])), 0,
-                  1.5e-3 * frame.shape[0], (0, 255, 0), 2)
+      for track in tracker.tracks:
+        if not track.is_confirmed() or track.time_since_update > 1:
+          continue
+        bbox = track.to_tlbr()
+        # most common detection class for track
+        track_cls = track.cls
+
+        midpoint = track.tlbr_midpoint(bbox)
+        origin_midpoint = (midpoint[0], frame.shape[0] - midpoint[1])  
+        # get midpoint respective to botton-left
+
+        if track.track_id not in memory:
+          memory[track.track_id] = deque(maxlen=2)  
+
+        memory[track.track_id].append(midpoint)
+        previous_midpoint = memory[track.track_id][0]
+
+        origin_previous_midpoint = (previous_midpoint[0], frame.shape[0] - previous_midpoint[1])
+
+        cv2.line(frame, midpoint, previous_midpoint, (0, 255, 0), 2)
+
+        # Add to counter and get intersection details
+        A = midpoint
+        B = previous_midpoint
+        C = line[0]
+        D = line[1]
+        ccw1 = (D[1] - A[1]) * (C[0] - A[0]) > (C[1] - A[1]) * (D[0] - A[0])
+        ccw2 = (D[1] - B[1]) * (C[0] - B[0]) > (C[1] - B[1]) * (D[0] - B[0])
+        ccw3 = (C[1] - A[1]) * (B[0] - A[0]) > (B[1] - A[1]) * (C[0] - A[0])
+        ccw4 = (D[1] - A[1]) * (B[0] - A[0]) > (B[1] - A[1]) * (D[0] - A[0])
+
+        CC = line2[0]
+        DD = line2[1]
+        ccw5 = (DD[1] - A[1]) * (CC[0] - A[0]) > (CC[1] - A[1]) * (DD[0] - A[0])
+        ccw6 = (DD[1] - B[1]) * (CC[0] - B[0]) > (CC[1] - B[1]) * (DD[0] - B[0])
+        ccw7 = (CC[1] - A[1]) * (B[0] - A[0]) > (B[1] - A[1]) * (CC[0] - A[0])
+        ccw8 = (DD[1] - A[1]) * (B[0] - A[0]) > (B[1] - A[1]) * (DD[0] - A[0])
+
+        if (ccw1 != ccw2 and ccw3 != ccw4) and track.track_id not in already_counted:
+          class_counter[track_cls] += 1
+          total_counter += 1
+          # draw red line
+          cv2.line(frame, line[0], line[1], (0, 0, 255), 2)
+          already_counted.append(track.track_id)  # Set already counted for ID to true.
+          intersection_time = datetime.datetime.now() - datetime.timedelta(microseconds=datetime.datetime.now().microsecond)
+          intersect_info.append([track_cls, origin_midpoint, intersection_time])
+
+        elif (ccw5 != ccw6 and ccw7 != ccw8) and track.track_id not in already_counted:
+          class_counter2[track_cls] += 1
+          total_counter2 += 1
+          # draw red line
+          cv2.line(frame, line2[0], line2[1], (0, 0, 255), 2)
+          already_counted.append(track.track_id)  # Set already counted for ID to true.
+          intersection_time = datetime.datetime.now() - datetime.timedelta(microseconds=datetime.datetime.now().microsecond)
+          intersect_info2.append([track_cls, origin_midpoint, intersection_time])
+
+
+        cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (255, 255, 255), 2)  # WHITE BOX
+        cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1])), 0,
+                    1.5e-3 * frame.shape[0], (0, 255, 0), 2)
 
       if not show_detections:
           adc = "%.2f" % (track.adc * 100) + "%"  # Average detection confidence

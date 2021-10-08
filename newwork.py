@@ -153,8 +153,6 @@ def main(_argv):
       bbox = det.to_tlbr()
       if show_detections and len(classes) > 0:
         det_cls = det.cls
-        score = "%.2f" % (det.confidence * 100) + "%"
-        cv2.putText(frame, str(det_cls) + " " + score, (int(bbox[0]), int(bbox[3])), 0, 1e-3 * frame.shape[0], (0, 255, 0), 1)
         cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (255, 0, 0), 2)
 
     for track in tracker.tracks:

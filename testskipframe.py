@@ -172,6 +172,7 @@ def main(_argv):
     line2 = [(int(0.05 * frameX), int(0.6 * frameY)), (int(0.2 * frameX), int(0.65 * frameY))]
     cv2.line(frame, line2[0], line2[1], (255, 0, 0), 2)   #(image, start_point, end_point, color, thickness)
 
+    print("frame_index%2", frame_index%2)
     if (frame_index%2 == 0):
       for track in tracker.tracks:
         if not track.is_confirmed() or track.time_since_update > 1:

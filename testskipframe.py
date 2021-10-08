@@ -160,20 +160,19 @@ def main(_argv):
     indices = preprocessing.non_max_suppression(boxes, nms_max_overlap, scores)
     detections = [detections[i] for i in indices]
 
-    # Call the tracker
-    tracker.predict()
-    tracker.update(detections)
-
-    #สร้างและวาดเส้นผ่าน
-    frameY = frame.shape[0] #360
-    frameX = frame.shape[1] #640
-    line = [(int(0.3 * frameX), int(0.8 * frameY)), (int(0.55 * frameX), int(0.85 * frameY))]
-    cv2.line(frame, line[0], line[1], (0, 255, 255), 2)   #(image, start_point, end_point, color, thickness)
-    line2 = [(int(0.05 * frameX), int(0.6 * frameY)), (int(0.2 * frameX), int(0.65 * frameY))]
-    cv2.line(frame, line2[0], line2[1], (255, 0, 0), 2)   #(image, start_point, end_point, color, thickness)
-
-    print("frame_index%2", frame_index%2)
     if (frame_index%2 == 0):
+      # Call the tracker
+      tracker.predict()
+      tracker.update(detections)
+
+      #สร้างและวาดเส้นผ่าน
+      frameY = frame.shape[0] #360
+      frameX = frame.shape[1] #640
+      line = [(int(0.3 * frameX), int(0.8 * frameY)), (int(0.55 * frameX), int(0.85 * frameY))]
+      cv2.line(frame, line[0], line[1], (0, 255, 255), 2)   #(image, start_point, end_point, color, thickness)
+      line2 = [(int(0.05 * frameX), int(0.6 * frameY)), (int(0.2 * frameX), int(0.65 * frameY))]
+      cv2.line(frame, line2[0], line2[1], (255, 0, 0), 2)   #(image, start_point, end_point, color, thickness)
+
       for track in tracker.tracks:
         if not track.is_confirmed() or track.time_since_update > 1:
           continue

@@ -19,6 +19,7 @@ from deep_sort import nn_matching
 from deep_sort.detection import Detection
 from deep_sort.tracker import Tracker
 from tools import generate_detections as gdet
+from tools import splitFile
 import imutils.video
 from videocaptureasync import VideoCaptureAsync
 
@@ -30,58 +31,10 @@ import math
 warnings.filterwarnings('ignore')
 
 def main(_argv):
-  input_T = FLAGS.text
-  file1 = open(input_T, "r")
-  FileContent = file1.read()
-  AS = FileContent.split()
-  inform = []
-  car_num = []
-  
-  c = -1
-  y = 0
-  for x in range(len(AS)-1):
-    xx = AS[x].split(',')
-    if y == 0:
-      if AS[x] == "#":
-        c = c+1
-        car_num.append(AS[x+3])
-        skip = x+3
-        inform.append([])
-      elif len(xx) == 2:
-        if xx[1] != '':
-          y = 1
-          inform[c].append(AS[x]+AS[x+1])
-      elif  x > skip:
-        inform[c].append(AS[x])
-    else:
-      y = 0
-      
-  boxes_s = []
-  confidence_s = []
-  classes_s = []
-  
-  for a in range(len(inform)):
-    subclass = [] 
-    subconfidence = []
-    subbox = []
-    for b in range(len(inform[a])):
-      eachBox = inform[a][b]
-      SEachBox = eachBox.split(',')
-      Frame = SEachBox[0]
-      subclass.append(SEachBox[1])
-      subconfidence.append(float(SEachBox[6]))
-      ssubbox = []
-      ssubbox.append(float(SEachBox[2]))
-      ssubbox.append(float(SEachBox[3]))
-      w = float(SEachBox[4]) - float(SEachBox[2])
-      h = float(SEachBox[5]) - float(SEachBox[3])
-      ssubbox.append(w)
-      ssubbox.append(h)
-      subbox.append(ssubbox)
-    classes_s.append(subclass)
-    confidence_s.append(subconfidence)
-    boxes_s.append(subbox)
-    
+  classes_s,confidence_s,boxes_s = splitFile.spilttxt(FLAGS.text)
+  print("classes_s",classes_s)
+  print("confidence_s",confidence_s)
+  print("boxes_s",boxes_s)
   # Definition of the parameters
   max_cosine_distance = 0.3
   nn_budget = None

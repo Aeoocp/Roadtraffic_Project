@@ -157,7 +157,7 @@ def main(_argv):
 
       cv2.line(frame, midpoint, previous_midpoint, (0, 255, 0), 2)
       
-      TC = CheckCrossLine(midpoint, previous_midpoint, line[0] ,line[1])
+      TC = CheckCrossLine.LineCrossing(midpoint, previous_midpoint, line[0] ,line[1])
       if TC and (track.track_id not in already_counted):
         class_counter[track_cls] += 1
         total_counter += 1

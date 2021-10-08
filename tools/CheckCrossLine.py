@@ -8,6 +8,6 @@ def LineCrossing(midpoint,p_midpoint,line0,line1):
   ccw3 = (C[1] - A[1]) * (B[0] - A[0]) > (B[1] - A[1]) * (C[0] - A[0])
   ccw4 = (D[1] - A[1]) * (B[0] - A[0]) > (B[1] - A[1]) * (D[0] - A[0])
   if (ccw1 != ccw2 and ccw3 != ccw4):
-    return true
+    return True
   else:
-    return false
+    return False

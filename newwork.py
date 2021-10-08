@@ -22,6 +22,11 @@ from tools import generate_detections as gdet
 import imutils.video
 from videocaptureasync import VideoCaptureAsync
 
+from collections import Counter
+from collections import deque 
+import datetime
+import math
+
 warnings.filterwarnings('ignore')
 
 def main(_argv):
@@ -115,6 +120,21 @@ def main(_argv):
 
   fps = 0.0
   fps_imutils = imutils.video.FPS().start()
+  current_date = datetime.datetime.now().date()
+  count_dict = {}
+  
+  total_counter = 0
+  total_counter2 = 0
+  
+  class_counter = Counter()  # store counts of each detected class
+  class_counter2 = Counter()
+  already_counted = deque(maxlen=50)  # temporary memory for storing counted IDs
+  intersect_info = []  # initialise intersection list
+  intersect_info2 = []
+    
+  memory = {}
+  memory2 = {}
+  maxId = 0
 
   while True:
     print("frame", frame_index+1)
@@ -145,12 +165,24 @@ def main(_argv):
     # Call the tracker
     tracker.predict()
     tracker.update(detections)
+    
+    #สร้างและวาดเส้นผ่าน
+    frameY = frame.shape[0] #360
+    frameX = frame.shape[1] #640
+    line = [(int(0.3 * frameX), int(0.8 * frameY)), (int(0.55 * frameX), int(0.85 * frameY))]
+    cv2.line(frame, line[0], line[1], (0, 255, 255), 2)   #(image, start_point, end_point, color, thickness)
+    line2 = [(int(0.05 * frameX), int(0.6 * frameY)), (int(0.2 * frameX), int(0.65 * frameY))]
+    cv2.line(frame, line2[0], line2[1], (255, 0, 0), 2)   #(image, start_point, end_point, color, thickness)
 
     for track in tracker.tracks:
       if not track.is_confirmed() or track.time_since_update > 1:
         continue
       bbox = track.to_tlbr()
       track_cls = track.cls
+      
+      midpoint = track.tlbr_midpoint(bbox)
+      origin_midpoint = (midpoint[0], frame.shape[0] - midpoint[1])
+      
       if track_cls == "car":
         cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (255, 255, 255), 2)
         cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1])), 0, 1.5e-3 * frame.shape[0], (0, 255, 0), 1)
@@ -164,6 +196,17 @@ def main(_argv):
         cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1])), 0, 1.0e-3 * frame.shape[0], (255, 0, 0), 1)
         cv2.putText(frame, str(track_cls), (int(bbox[0]), int(bbox[3])), 0, 1e-3 * frame.shape[0], (255, 0, 0), 1)
 
+      if track.track_id not in memory:
+        memory[track.track_id] = deque(maxlen=2)  
+
+      memory[track.track_id].append(midpoint)
+      previous_midpoint = memory[track.track_id][0]
+
+      origin_previous_midpoint = (previous_midpoint[0], frame.shape[0] - previous_midpoint[1])
+
+      cv2.line(frame, midpoint, previous_midpoint, (0, 255, 0), 2)
+        
+        
     if writeVideo_flag:
         # save a frame
         out.write(frame)

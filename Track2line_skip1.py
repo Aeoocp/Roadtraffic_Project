@@ -153,8 +153,6 @@ def main(_argv):
         memory[track.track_id] = deque(maxlen=3)  
 
       memory[track.track_id].append(midpoint)
-      if track.track_id == 9:
-        print("memory[track.track_id]",memory[track.track_id])
       previous_midpoint = memory[track.track_id][0]
       origin_previous_midpoint = (previous_midpoint[0], frame.shape[0] - previous_midpoint[1])
 

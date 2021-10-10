@@ -112,7 +112,7 @@ def main(_argv):
     line2 = [(int(0.05 * frameX), int(0.6 * frameY)), (int(0.2 * frameX), int(0.65 * frameY))]
     cv2.line(frame, line2[0], line2[1], (255, 255, 255), 2)   #(image, start_point, end_point, color, thickness)
     
-    if(frame_index%2 == 1)
+    if(frame_index%2 == 1):
       features = encoder(frame, boxes)
       detections = [Detection(bbox, confidence, cls, feature) for bbox, confidence, cls, feature in
                       zip(boxes, confidence, classes, features)]

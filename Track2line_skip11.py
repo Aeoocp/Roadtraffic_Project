@@ -107,52 +107,51 @@ def main(_argv):
     #สร้างและวาดเส้นผ่าน
     frameY = frame.shape[0] #360
     frameX = frame.shape[1] #640
-    line = [(int(0.3 * frameX), int(0.85 * frameY)), (int(0.55 * frameX), int(0.9 * frameY))]
+    line = [(int(0.2 * frameX), int(0.85 * frameY)), (int(0.55 * frameX), int(0.9 * frameY))]
     cv2.line(frame, line[0], line[1], (255, 255, 255), 2)   #(image, start_point, end_point, color, thickness)
     line2 = [(int(0.05 * frameX), int(0.6 * frameY)), (int(0.2 * frameX), int(0.65 * frameY))]
     cv2.line(frame, line2[0], line2[1], (255, 255, 255), 2)   #(image, start_point, end_point, color, thickness)
     
-    
-    features = encoder(frame, boxes)
-    detections = [Detection(bbox, confidence, cls, feature) for bbox, confidence, cls, feature in
-                    zip(boxes, confidence, classes, features)]
-    # Run non-maxima suppression.
-    boxes = np.array([d.tlwh for d in detections])
-    scores = np.array([d.confidence for d in detections])
-    classes = np.array([d.cls for d in detections])
-    indices = preprocessing.non_max_suppression(boxes, nms_max_overlap, scores)
-    detections = [detections[i] for i in indices]
+    if(frame_index%2 == 1):
+      features = encoder(frame, boxes)
+      detections = [Detection(bbox, confidence, cls, feature) for bbox, confidence, cls, feature in
+                      zip(boxes, confidence, classes, features)]
+      # Run non-maxima suppression.
+      boxes = np.array([d.tlwh for d in detections])
+      scores = np.array([d.confidence for d in detections])
+      classes = np.array([d.cls for d in detections])
+      indices = preprocessing.non_max_suppression(boxes, nms_max_overlap, scores)
+      detections = [detections[i] for i in indices]
 
-    # Call the tracker
-    tracker.predict()
-    tracker.update(detections)
+      # Call the tracker
+      tracker.predict()
+      tracker.update(detections)
 
-    for track in tracker.tracks:
-      if not track.is_confirmed() or track.time_since_update > 1:
-        continue
-      bbox = track.to_tlbr()
-      track_cls = track.cls
+      for track in tracker.tracks:
+        if not track.is_confirmed() or track.time_since_update > 1:
+          continue
+        bbox = track.to_tlbr()
+        track_cls = track.cls
 
-      if track_cls == "car":
-        cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (0, 255, 0), 2)
-        cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1])), 0, 1.5e-3 * frame.shape[0], (0, 255, 0), 1)
-        cv2.putText(frame, str(track_cls), (int(bbox[0]), int(bbox[3])), 0, 1e-3 * frame.shape[0], (0, 255, 0), 1)
-      elif track_cls == "truck":
-        cv2.rectangle(frame, (int(bbox[0]+5), int(bbox[1]+5)), (int(bbox[2]+5), int(bbox[3]+5)), (0, 0, 255), 2)
-        cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1]-25)), 0, 1.5e-3 * frame.shape[0], (0, 0, 255), 1)
-        cv2.putText(frame, str(track_cls), (int(bbox[0]), int(bbox[3])), 0, 1e-3 * frame.shape[0], (0, 0, 255), 1)
-      else:
-        cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (255, 0, 0), 2)
-        cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1])), 0, 1.0e-3 * frame.shape[0], (255, 0, 0), 1)
-        cv2.putText(frame, str(track_cls), (int(bbox[0]), int(bbox[3])), 0, 1e-3 * frame.shape[0], (255, 0, 0), 1)
+        if track_cls == "car":
+          cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (0, 255, 0), 2)
+          cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1])), 0, 1.5e-3 * frame.shape[0], (0, 255, 0), 1)
+          cv2.putText(frame, str(track_cls), (int(bbox[0]), int(bbox[3])), 0, 1e-3 * frame.shape[0], (0, 255, 0), 1)
+        elif track_cls == "truck":
+          cv2.rectangle(frame, (int(bbox[0]+5), int(bbox[1]+5)), (int(bbox[2]+5), int(bbox[3]+5)), (0, 0, 255), 2)
+          cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1]-25)), 0, 1.5e-3 * frame.shape[0], (0, 0, 255), 1)
+          cv2.putText(frame, str(track_cls), (int(bbox[0]), int(bbox[3])), 0, 1e-3 * frame.shape[0], (0, 0, 255), 1)
+        else:
+          cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (255, 0, 0), 2)
+          cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1])), 0, 1.0e-3 * frame.shape[0], (255, 0, 0), 1)
+          cv2.putText(frame, str(track_cls), (int(bbox[0]), int(bbox[3])), 0, 1e-3 * frame.shape[0], (255, 0, 0), 1)
 
-      if(frame_index%2 == 1):
         midpoint = track.tlbr_midpoint(bbox)
         # เก็บจุดกลางล่างต้นทาง? 
         origin_midpoint = (midpoint[0], frame.shape[0] - midpoint[1])
 
         if track.track_id not in memory:
-          memory[track.track_id] = deque(maxlen=3)  
+          memory[track.track_id] = deque(maxlen=5)  
 
         memory[track.track_id].append(midpoint)
         previous_midpoint = memory[track.track_id][0]
@@ -189,25 +188,25 @@ def main(_argv):
       if len(memory) > 50:
         del memory[list(memory)[0]]
 
-      # Draw total count.
-      cv2.putText(frame, "Total: {}".format(str(total_counter)), (int(0.8 * frame.shape[1]), int(0.1 * frame.shape[0])), 0,
+    # Draw total count.
+    cv2.putText(frame, "Total: {}".format(str(total_counter)), (int(0.8 * frame.shape[1]), int(0.1 * frame.shape[0])), 0,
+                1.5e-3 * frame.shape[0], (0, 255, 255), 2)
+    cv2.putText(frame, "Total2: {}".format(str(total_counter2)), (int(0.05 * frame.shape[1]), int(0.1 * frame.shape[0])), 0,
                   1.5e-3 * frame.shape[0], (0, 255, 255), 2)
-      cv2.putText(frame, "Total2: {}".format(str(total_counter2)), (int(0.05 * frame.shape[1]), int(0.1 * frame.shape[0])), 0,
-                    1.5e-3 * frame.shape[0], (0, 255, 255), 2)
 
-      # display counts for each class as they appear
-      y = 0.2 * frame.shape[0]
-      y2 = 0.2 * frame.shape[0]
-      for cls in class_counter:
-        class_count = class_counter[cls]
-        cv2.putText(frame, str(cls) + " " + str(class_count), (int(0.8 * frame.shape[1]), int(y)), 0,
-                    1.5e-3 * frame.shape[0], (0, 255, 255), 2)
-        y += 0.05 * frame.shape[0]
-      for cls in class_counter2:
-        class_count2 = class_counter2[cls]
-        cv2.putText(frame, str(cls) + " " + str(class_count2), (int(0.05 * frame.shape[1]), int(y2)), 0,
-                    1.5e-3 * frame.shape[0], (0, 255, 255), 2)
-        y2 += 0.05 * frame.shape[0]
+    # display counts for each class as they appear
+    y = 0.2 * frame.shape[0]
+    y2 = 0.2 * frame.shape[0]
+    for cls in class_counter:
+      class_count = class_counter[cls]
+      cv2.putText(frame, str(cls) + " " + str(class_count), (int(0.8 * frame.shape[1]), int(y)), 0,
+                  1.5e-3 * frame.shape[0], (0, 255, 255), 2)
+      y += 0.05 * frame.shape[0]
+    for cls in class_counter2:
+      class_count2 = class_counter2[cls]
+      cv2.putText(frame, str(cls) + " " + str(class_count2), (int(0.05 * frame.shape[1]), int(y2)), 0,
+                  1.5e-3 * frame.shape[0], (0, 255, 255), 2)
+      y2 += 0.05 * frame.shape[0]
         
     if writeVideo_flag:
         # save a frame

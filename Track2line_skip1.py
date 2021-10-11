@@ -107,7 +107,7 @@ def main(_argv):
     #สร้างและวาดเส้นผ่าน
     frameY = frame.shape[0] #360
     frameX = frame.shape[1] #640
-    line = [(int(0.3 * frameX), int(0.8 * frameY)), (int(0.55 * frameX), int(0.85 * frameY))]
+    line = [(int(0.3 * frameX), int(0.85 * frameY)), (int(0.55 * frameX), int(0.9 * frameY))]
     cv2.line(frame, line[0], line[1], (255, 255, 255), 2)   #(image, start_point, end_point, color, thickness)
     line2 = [(int(0.05 * frameX), int(0.6 * frameY)), (int(0.2 * frameX), int(0.65 * frameY))]
     cv2.line(frame, line2[0], line2[1], (255, 255, 255), 2)   #(image, start_point, end_point, color, thickness)
@@ -126,8 +126,6 @@ def main(_argv):
       # Call the tracker
       tracker.predict()
       tracker.update(detections)
-
-
 
       for track in tracker.tracks:
         if not track.is_confirmed() or track.time_since_update > 1:

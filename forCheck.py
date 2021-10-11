@@ -112,40 +112,41 @@ def main(_argv):
     line2 = [(int(0.05 * frameX), int(0.6 * frameY)), (int(0.2 * frameX), int(0.65 * frameY))]
     cv2.line(frame, line2[0], line2[1], (255, 255, 255), 2)   #(image, start_point, end_point, color, thickness)
     
-    if(frame_index%2 == 1):
-      features = encoder(frame, boxes)
-      detections = [Detection(bbox, confidence, cls, feature) for bbox, confidence, cls, feature in
-                      zip(boxes, confidence, classes, features)]
-      # Run non-maxima suppression.
-      boxes = np.array([d.tlwh for d in detections])
-      scores = np.array([d.confidence for d in detections])
-      classes = np.array([d.cls for d in detections])
-      indices = preprocessing.non_max_suppression(boxes, nms_max_overlap, scores)
-      detections = [detections[i] for i in indices]
+    
+    features = encoder(frame, boxes)
+    detections = [Detection(bbox, confidence, cls, feature) for bbox, confidence, cls, feature in
+                    zip(boxes, confidence, classes, features)]
+    # Run non-maxima suppression.
+    boxes = np.array([d.tlwh for d in detections])
+    scores = np.array([d.confidence for d in detections])
+    classes = np.array([d.cls for d in detections])
+    indices = preprocessing.non_max_suppression(boxes, nms_max_overlap, scores)
+    detections = [detections[i] for i in indices]
 
-      # Call the tracker
-      tracker.predict()
-      tracker.update(detections)
+    # Call the tracker
+    tracker.predict()
+    tracker.update(detections)
 
-      for track in tracker.tracks:
-        if not track.is_confirmed() or track.time_since_update > 1:
-          continue
-        bbox = track.to_tlbr()
-        track_cls = track.cls
+    for track in tracker.tracks:
+      if not track.is_confirmed() or track.time_since_update > 1:
+        continue
+      bbox = track.to_tlbr()
+      track_cls = track.cls
 
-        if track_cls == "car":
-          cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (0, 255, 0), 2)
-          cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1])), 0, 1.5e-3 * frame.shape[0], (0, 255, 0), 1)
-          cv2.putText(frame, str(track_cls), (int(bbox[0]), int(bbox[3])), 0, 1e-3 * frame.shape[0], (0, 255, 0), 1)
-        elif track_cls == "truck":
-          cv2.rectangle(frame, (int(bbox[0]+5), int(bbox[1]+5)), (int(bbox[2]+5), int(bbox[3]+5)), (0, 0, 255), 2)
-          cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1]-25)), 0, 1.5e-3 * frame.shape[0], (0, 0, 255), 1)
-          cv2.putText(frame, str(track_cls), (int(bbox[0]), int(bbox[3])), 0, 1e-3 * frame.shape[0], (0, 0, 255), 1)
-        else:
-          cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (255, 0, 0), 2)
-          cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1])), 0, 1.0e-3 * frame.shape[0], (255, 0, 0), 1)
-          cv2.putText(frame, str(track_cls), (int(bbox[0]), int(bbox[3])), 0, 1e-3 * frame.shape[0], (255, 0, 0), 1)
+      if track_cls == "car":
+        cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (0, 255, 0), 2)
+        cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1])), 0, 1.5e-3 * frame.shape[0], (0, 255, 0), 1)
+        cv2.putText(frame, str(track_cls), (int(bbox[0]), int(bbox[3])), 0, 1e-3 * frame.shape[0], (0, 255, 0), 1)
+      elif track_cls == "truck":
+        cv2.rectangle(frame, (int(bbox[0]+5), int(bbox[1]+5)), (int(bbox[2]+5), int(bbox[3]+5)), (0, 0, 255), 2)
+        cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1]-25)), 0, 1.5e-3 * frame.shape[0], (0, 0, 255), 1)
+        cv2.putText(frame, str(track_cls), (int(bbox[0]), int(bbox[3])), 0, 1e-3 * frame.shape[0], (0, 0, 255), 1)
+      else:
+        cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (255, 0, 0), 2)
+        cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1])), 0, 1.0e-3 * frame.shape[0], (255, 0, 0), 1)
+        cv2.putText(frame, str(track_cls), (int(bbox[0]), int(bbox[3])), 0, 1e-3 * frame.shape[0], (255, 0, 0), 1)
 
+      if(frame_index%2 == 1):
         midpoint = track.tlbr_midpoint(bbox)
         # เก็บจุดกลางล่างต้นทาง? 
         origin_midpoint = (midpoint[0], frame.shape[0] - midpoint[1])

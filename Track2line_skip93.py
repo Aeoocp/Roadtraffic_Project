@@ -67,7 +67,7 @@ def main(_argv):
       w = int(video_capture.get(3))
       h = int(video_capture.get(4))
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    out = cv2.VideoWriter('output_2line_skip1.avi', fourcc, 30, (w, h))
+    out = cv2.VideoWriter('output_2line.avi', fourcc, 30, (w, h))
     frame_index = -1
 
   fps = 0.0
@@ -104,14 +104,6 @@ def main(_argv):
         confidence = confidence_s[frame_index+1]
         classes = classes_s[frame_index+1]
 
-      #สร้างและวาดเส้นผ่าน
-      frameY = frame.shape[0] #360
-      frameX = frame.shape[1] #640
-      line = [(int(0.2 * frameX), int(0.85 * frameY)), (int(0.55 * frameX), int(0.9 * frameY))]
-      cv2.line(frame, line[0], line[1], (255, 255, 255), 2)   #(image, start_point, end_point, color, thickness)
-      line2 = [(int(0.05 * frameX), int(0.6 * frameY)), (int(0.2 * frameX), int(0.65 * frameY))]
-      cv2.line(frame, line2[0], line2[1], (255, 255, 255), 2)   #(image, start_point, end_point, color, thickness)
-    
       features = encoder(frame, boxes)
       detections = [Detection(bbox, confidence, cls, feature) for bbox, confidence, cls, feature in
                       zip(boxes, confidence, classes, features)]
@@ -125,6 +117,14 @@ def main(_argv):
       # Call the tracker
       tracker.predict()
       tracker.update(detections)
+
+      #สร้างและวาดเส้นผ่าน
+      frameY = frame.shape[0] #360
+      frameX = frame.shape[1] #640
+      line = [(int(0.3 * frameX), int(0.8 * frameY)), (int(0.55 * frameX), int(0.85 * frameY))]
+      cv2.line(frame, line[0], line[1], (255, 255, 255), 2)   #(image, start_point, end_point, color, thickness)
+      line2 = [(int(0.05 * frameX), int(0.6 * frameY)), (int(0.2 * frameX), int(0.65 * frameY))]
+      cv2.line(frame, line2[0], line2[1], (255, 255, 255), 2)   #(image, start_point, end_point, color, thickness)
 
       for track in tracker.tracks:
         if not track.is_confirmed() or track.time_since_update > 1:
@@ -146,11 +146,11 @@ def main(_argv):
           cv2.putText(frame, str(track_cls), (int(bbox[0]), int(bbox[3])), 0, 1e-3 * frame.shape[0], (255, 0, 0), 1)
 
         midpoint = track.tlbr_midpoint(bbox)
-        # เก็บจุดกลางล่างต้นทาง? 
+        # get midpoint respective to botton-left
         origin_midpoint = (midpoint[0], frame.shape[0] - midpoint[1])
 
         if track.track_id not in memory:
-          memory[track.track_id] = deque(maxlen=5)  
+          memory[track.track_id] = deque(maxlen=2)  
 
         memory[track.track_id].append(midpoint)
         previous_midpoint = memory[track.track_id][0]
@@ -182,10 +182,10 @@ def main(_argv):
           intersection_time = datetime.datetime.now() - datetime.timedelta(microseconds=datetime.datetime.now().microsecond)
           intersect_info2.append([track_cls, origin_midpoint, intersection_time])
 
-        # Delete memory of old tracks.
-        # This needs to be larger than the number of tracked objects in the frame.  
-        if len(memory) > 50:
-          del memory[list(memory)[0]]
+      # Delete memory of old tracks.
+      # This needs to be larger than the number of tracked objects in the frame.  
+      if len(memory) > 50:
+        del memory[list(memory)[0]]
 
       # Draw total count.
       cv2.putText(frame, "Total: {}".format(str(total_counter)), (int(0.8 * frame.shape[1]), int(0.1 * frame.shape[0])), 0,
@@ -210,19 +210,19 @@ def main(_argv):
       cv2.putText(frame, "frame_index " + str(frame_index), (int(0.7 * frame.shape[1]), int(0.9 * frame.shape[0])), 0,
                     1.5e-3 * frame.shape[0], (255, 255, 255), 2)
 
-    if writeVideo_flag:
-        # save a frame
-        out.write(frame)
-        frame_index = frame_index + 1
+      if writeVideo_flag:
+          # save a frame
+          out.write(frame)
+          frame_index = frame_index + 1
 
-    fps_imutils.update()
+      fps_imutils.update()
 
-    if not asyncVideo_flag:
-      fps = (fps + (1. / (time.time() - t1))) / 2
+      if not asyncVideo_flag:
+        fps = (fps + (1. / (time.time() - t1))) / 2
 
-    # Press Q to stop!
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-      break
+      # Press Q to stop!
+      if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
 
   fps_imutils.stop()
   print('imutils FPS: {}'.format(fps_imutils.fps()))

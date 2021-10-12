@@ -90,14 +90,14 @@ def main(_argv):
 
   while True:
     print("frame", frame_index+1)
+    
+    ret, frame = video_capture.read()  # frame shape 640*480*3
+
+    if ret != True:
+      break
+
+    t1 = time.time()
     if(frame_index%2 == 1):
-      ret, frame = video_capture.read()  # frame shape 640*480*3
-
-      if ret != True:
-        break
-
-      t1 = time.time()
-
       image = Image.fromarray(frame[..., ::-1])  # bgr to rgb
       if frame_index+1 < len(boxes_s):
         boxes = boxes_s[frame_index+1]

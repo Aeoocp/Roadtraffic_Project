@@ -67,7 +67,7 @@ def main(_argv):
       w = int(video_capture.get(3))
       h = int(video_capture.get(4))
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    out = cv2.VideoWriter('output_2line.avi', fourcc, 30, (w, h))
+    out = cv2.VideoWriter('output_skip110.avi', fourcc, 30, (w, h))
     frame_index = -1
 
   fps = 0.0

@@ -206,6 +206,9 @@ def main(_argv):
       cv2.putText(frame, str(cls) + " " + str(class_count2), (int(0.05 * frame.shape[1]), int(y2)), 0,
                   1.5e-3 * frame.shape[0], (0, 255, 255), 2)
       y2 += 0.05 * frame.shape[0]
+      
+    cv2.putText(frame, "frame_index " + str(frame_index), (int(0.8 * frame.shape[1]), int(0.9 * frame.shape[0])), 0,
+                  1.5e-3 * frame.shape[0], (255, 255, 255), 2)
         
     if writeVideo_flag:
         # save a frame

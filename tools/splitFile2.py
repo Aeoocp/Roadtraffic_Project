@@ -33,7 +33,7 @@ def spilttxt(input_T):
     subconfidence = []
     subbox = []
     for b in range(len(inform[a])):
-      if(SEachBox[1] == 'car')
+      if(SEachBox[1] == 'car'):
         eachBox = inform[a][b]
         SEachBox = eachBox.split(',')
         subclass.append(SEachBox[1])

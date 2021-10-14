@@ -19,7 +19,7 @@ from deep_sort import nn_matching
 from deep_sort.detection import Detection
 from deep_sort.tracker import Tracker
 from tools import generate_detections as gdet
-from tools import splitFile
+from tools import splitFile2
 from tools import CheckCrossLine
 import imutils.video
 from videocaptureasync import VideoCaptureAsync
@@ -32,7 +32,7 @@ import math
 warnings.filterwarnings('ignore')
 
 def main(_argv):
-  classes_s,confidence_s,boxes_s = splitFile.spilttxt(FLAGS.text)
+  classes_s,confidence_s,boxes_s = splitFile2.spilttxt(FLAGS.text)
   
   # Definition of the parameters
   max_cosine_distance = 0.3

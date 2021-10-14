@@ -33,19 +33,19 @@ def spilttxt(input_T):
     subconfidence = []
     subbox = []
     for b in range(len(inform[a])):
-      eachBox = inform[a][b]
-      SEachBox = eachBox.split(',')
-      Frame = SEachBox[0]
-      subclass.append(SEachBox[1])
-      subconfidence.append(float(SEachBox[6]))
-      ssubbox = []
-      ssubbox.append(float(SEachBox[2]))
-      ssubbox.append(float(SEachBox[3]))
-      w = float(SEachBox[4]) - float(SEachBox[2])
-      h = float(SEachBox[5]) - float(SEachBox[3])
-      ssubbox.append(w)
-      ssubbox.append(h)
-      subbox.append(ssubbox)
+      if(SEachBox[1] == 'car')
+        eachBox = inform[a][b]
+        SEachBox = eachBox.split(',')
+        subclass.append(SEachBox[1])
+        subconfidence.append(float(SEachBox[6]))
+        ssubbox = []
+        ssubbox.append(float(SEachBox[2]))
+        ssubbox.append(float(SEachBox[3]))
+        w = float(SEachBox[4]) - float(SEachBox[2])
+        h = float(SEachBox[5]) - float(SEachBox[3])
+        ssubbox.append(w)
+        ssubbox.append(h)
+        subbox.append(ssubbox)
     classes_s.append(subclass)
     confidence_s.append(subconfidence)
     boxes_s.append(subbox)

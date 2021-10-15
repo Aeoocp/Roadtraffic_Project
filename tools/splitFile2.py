@@ -32,6 +32,7 @@ def spilttxt(input_T):
     subclass = [] 
     subconfidence = []
     subbox = []
+    midpointsave = []
     for b in range(len(inform[a])):
       eachBox = inform[a][b]
       SEachBox = eachBox.split(',')
@@ -45,7 +46,25 @@ def spilttxt(input_T):
         h = float(SEachBox[5]) - float(SEachBox[3])
         ssubbox.append(w)
         ssubbox.append(h)
-        subbox.append(ssubbox)
+        midpoint = ((w/2), (h/2))
+        if not midpointsave:
+          midpointsave.append(midpoint)
+          subbox.append(ssubbox) 
+        else:
+          xx = True
+          yy = True
+          x2 = midpoint[0]
+          y2 = midpoint[1]
+          for mid in midpointsave:
+            x1 = mid[0]
+            y1 = mid[1]
+            if(x1-5<x2) and (x1+5>x2):
+              xx = False
+            if((y1-5<y2) and (y1+5>y2)):
+              yy = False
+          if xx and yy:
+            midpointsave.append(midpoint)
+            subbox.append(ssubbox)
     classes_s.append(subclass)
     confidence_s.append(subconfidence)
     boxes_s.append(subbox)

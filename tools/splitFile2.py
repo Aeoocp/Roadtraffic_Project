@@ -58,9 +58,9 @@ def spilttxt(input_T):
           for mid in midpointsave:
             x1 = mid[0]
             y1 = mid[1]
-            if(x1-5<x2) and (x1+5>x2):
+            if(x1-1<x2) and (x1+1>x2):
               xx = False
-            if((y1-5<y2) and (y1+5>y2)):
+            if((y1-1<y2) and (y1+1>y2)):
               yy = False
           if xx and yy:
             midpointsave.append(midpoint)

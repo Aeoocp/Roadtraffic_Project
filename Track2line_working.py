@@ -122,9 +122,9 @@ def main(_argv):
     frameY = frame.shape[0] #360
     frameX = frame.shape[1] #640
     line = [(int(0.2 * frameX), int(0.8 * frameY)), (int(0.55 * frameX), int(0.85 * frameY))]
-    cv2.line(frame, line[0], line[1], (255, 255, 255), 2)   #(image, start_point, end_point, color, thickness)
+    cv2.line(frame, line[0], line[1], (255, 255, 255), 2)
     line2 = [(int(0.05 * frameX), int(0.6 * frameY)), (int(0.2 * frameX), int(0.65 * frameY))]
-    cv2.line(frame, line2[0], line2[1], (255, 255, 255), 2)   #(image, start_point, end_point, color, thickness)
+    cv2.line(frame, line2[0], line2[1], (255, 255, 255), 2)
 
     for track in tracker.tracks:
       if not track.is_confirmed() or track.time_since_update > 1:
@@ -132,18 +132,6 @@ def main(_argv):
       bbox = track.to_tlbr()
       track_cls = track.cls
       
-      if track_cls == "car":
-        cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (0, 255, 0), 2)
-        cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1])), 0, 1.5e-3 * frame.shape[0], (0, 255, 0), 1)
-        cv2.putText(frame, str(track_cls), (int(bbox[0]), int(bbox[3])), 0, 1e-3 * frame.shape[0], (0, 255, 0), 1)
-      elif track_cls == "truck":
-        cv2.rectangle(frame, (int(bbox[0]+5), int(bbox[1]+5)), (int(bbox[2]+5), int(bbox[3]+5)), (0, 0, 255), 2)
-        cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1]-25)), 0, 1.5e-3 * frame.shape[0], (0, 0, 255), 1)
-        cv2.putText(frame, str(track_cls), (int(bbox[0]), int(bbox[3])), 0, 1e-3 * frame.shape[0], (0, 0, 255), 1)
-      else:
-        cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (255, 0, 0), 2)
-        cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1])), 0, 1.0e-3 * frame.shape[0], (255, 0, 0), 1)
-        cv2.putText(frame, str(track_cls), (int(bbox[0]), int(bbox[3])), 0, 1e-3 * frame.shape[0], (255, 0, 0), 1)
       
       midpoint = track.tlbr_midpoint(bbox)
       # get midpoint respective to botton-left
@@ -155,13 +143,6 @@ def main(_argv):
       memory[track.track_id].append(midpoint)
       previous_midpoint = memory[track.track_id][0]
       origin_previous_midpoint = (previous_midpoint[0], frame.shape[0] - previous_midpoint[1])
-      
-      if track_cls == "car":
-        cv2.line(frame, midpoint, previous_midpoint, (0, 255, 0), 2)
-      elif track_cls == "truck":
-        cv2.line(frame, midpoint, previous_midpoint, (0, 0, 255), 2)
-      else:
-        cv2.line(frame, midpoint, previous_midpoint, (255, 0, 0), 2)
       
       TC = CheckCrossLine.LineCrossing(midpoint, previous_midpoint, line[0] ,line[1])
       TC2 = CheckCrossLine.LineCrossing(midpoint, previous_midpoint, line2[0] ,line2[1])

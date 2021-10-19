@@ -68,7 +68,7 @@ def main(_argv):
       h = int(video_capture.get(4))
     fourcc = cv2.VideoWriter_fourcc(*FLAGS.output_format)
     out = cv2.VideoWriter(FLAGS.output, fourcc, 30, (w, h))
-    frame_index = -1
+    frame_index = 0
 
   fps = 0.0
   fps_imutils = imutils.video.FPS().start()
@@ -86,10 +86,9 @@ def main(_argv):
     
   memory = {}
   memory2 = {}
-  maxId = 0
 
   while True:
-    print("frame", frame_index+1)
+    print("frame", frame_index)
 
     ret, frame = video_capture.read()  # frame shape 640*480*3
 
@@ -100,9 +99,9 @@ def main(_argv):
 
     image = Image.fromarray(frame[..., ::-1])  # bgr to rgb
     if frame_index+1 < len(boxes_s):
-      boxes = boxes_s[frame_index+1]
-      confidence = confidence_s[frame_index+1]
-      classes = classes_s[frame_index+1]
+      boxes = boxes_s[frame_index]
+      confidence = confidence_s[frame_index]
+      classes = classes_s[frame_index]
 
     features = encoder(frame, boxes)
     detections = [Detection(bbox, confidence, cls, feature) for bbox, confidence, cls, feature in

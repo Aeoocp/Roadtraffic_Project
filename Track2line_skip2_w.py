@@ -46,7 +46,6 @@ def main(_argv):
   metric = nn_matching.NearestNeighborDistanceMetric("cosine", max_cosine_distance, nn_budget)
   tracker = Tracker(metric)
 
-  show_detections = True
   writeVideo_flag = True
   asyncVideo_flag = False
 

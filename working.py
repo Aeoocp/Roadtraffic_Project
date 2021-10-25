@@ -97,6 +97,7 @@ def main(_argv):
     #สร้างและวาดเส้นผ่าน
     frameY = frame.shape[0] #360
     frameX = frame.shape[1] #640
+    
     line = [(int(0.5 * frameX), int(0.8 * frameY)), (int(0.9 * frameX), int(0.7 * frameY))]
     line2 = [(int(0.175 * frameX), int(0.6 * frameY)), (int(0.3 * frameX), int(0.55 * frameY))]
 

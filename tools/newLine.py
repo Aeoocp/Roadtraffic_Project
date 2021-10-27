@@ -1,4 +1,4 @@
-def createLine()
+def createLine():
   numLine = int(input("Enter number of counting line :"))
   x = []
   y = []

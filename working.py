@@ -69,7 +69,7 @@ def main(_argv):
       w = int(video_capture.get(3))
       h = int(video_capture.get(4))
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    out = cv2.VideoWriter('output_2line.avi', fourcc, 30, (w, h))
+    out = cv2.VideoWriter(FLAGS.output, fourcc, 30, (w, h))
     frame_index = -1
 
   fps = 0.0
@@ -81,20 +81,11 @@ def main(_argv):
   class_counter = []  # store counts of each detected class
   intersect_info = [] # initialise intersection list
   for ll in range(l):
-    total_counter.append([])
+    total_counter.append(0)
     class_counter.append(Counter())
     intersect_info.append([])
   already_counted = deque(maxlen=50) # temporary memory for storing counted IDs
   memory = {}
-  """
-  total_counter = 0
-  total_counter2 = 0
-  class_counter = Counter()  # store counts of each detected class
-  class_counter2 = Counter()
-  intersect_info = []  # initialise intersection list
-  intersect_info2 = []
-  """
-  maxId = 0
 
   while True:
     print("frame", frame_index+1)
@@ -137,10 +128,6 @@ def main(_argv):
       y2 = float(y[ll*2+1])
       line_c = [(int(x1 * frameX), int(y1* frameY)), (int(x2 * frameX), int(y2 * frameY))]
       line.append(line_c)
-    """
-    line = [(int(0.2 * frameX), int(0.8 * frameY)), (int(0.55 * frameX), int(0.85 * frameY))]
-    line2 = [(int(0.05 * frameX), int(0.6 * frameY)), (int(0.2 * frameX), int(0.65 * frameY))]
-    """
     for ll in range(l):
       line_o = line[ll]
       cv2.line(frame, line_o[0], line_o[1], (255, 255, 255), 2)
@@ -168,14 +155,10 @@ def main(_argv):
           class_counter[ll][track_cls] += 1
           total_counter[ll] += 1
           # draw alert line
-          cv2.line(frame, line_o[0], line_o[1], (0, 255, 255), 2)
+          cv2.line(frame, line_o[0], line_o[1], (0, 0, 255), 2)
           already_counted.append(track.track_id)  # Set already counted for ID to true.
           intersection_time = datetime.datetime.now() - datetime.timedelta(microseconds=datetime.datetime.now().microsecond)
           intersect_info[ll].append([track_cls, origin_midpoint, intersection_time])
-          """
-          TC = CheckCrossLine.LineCrossing(midpoint, previous_midpoint, line[0] ,line[1])
-          TC2 = CheckCrossLine.LineCrossing(midpoint, previous_midpoint, line2[0] ,line2[1])
-          """
         
     # Delete memory of old tracks.
     # This needs to be larger than the number of tracked objects in the frame.  
@@ -185,19 +168,13 @@ def main(_argv):
     # Draw total count.
     yy = 0.1 * frame.shape[0]
     for ll in range(l):
-      cv2.putText(frame, "Total: {}".format(str(total_counter[ll])), (int(0.05 * frame.shape[1]), int(0.1 * frame.shape[0])), 0,
+      cv2.putText(frame, "Total: {}".format(str(total_counter[ll])), (int(0.05 * frame.shape[1]), int(yy)), 0,
                 1.5e-3 * frame.shape[0], (0, 255, 255), 2)
-      yy += 0.05 * frame.shape[0]
-      print("Total: ",total_counter[ll])
-    
-    # display counts for each class as they appear
-    for ll in range(l):
-      print("Road:" ,ll)
-      for cls in class_counter[ll]:
-        class_count = class_counter[cls]
-        print(str(cls)," ",str(class_count))
+      yy += 0.1 * frame.shape[0]
+      xx = ll+1
+      print("Total",xx,": ",total_counter[ll])
       
-    cv2.putText(frame, "frame_index " + str(frame_index), (int(0.7 * frame.shape[1]), int(0.9 * frame.shape[0])), 0,
+    cv2.putText(frame, "frame_index " + str(frame_index), (int(0.5 * frame.shape[1]), int(0.9 * frame.shape[0])), 0,
                   1.5e-3 * frame.shape[0], (255, 255, 255), 2)
         
     if writeVideo_flag:

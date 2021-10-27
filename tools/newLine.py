@@ -1,12 +1,15 @@
-
-from collections import Counter
-
-def createLine(frame,mulX1,mulX2,mulY1,mulY2)
-  frameY = frame.shape[0] #360
-  frameX = frame.shape[1] #640
-  line = [(int(mulX1 * frameX), int(mulY1 * frameY)), (int(mulX2 * frameX), int(mulY2 * frameY))]
-  total_counter = 0
-  class_counter = Counter()
-  intersect_info = []
-  memory = {}
-  
+def createLine()
+  numLine = int(input("Enter number of counting line :"))
+  x = []
+  y = []
+  s_line = []
+  for l in range(numLine):
+    print("Enter the beginning and ending of the line (0-1) (x,y) :")
+    print("Line",l+1)
+    Bp = input("Beginning Point :").split(",")
+    x.append((Bp[0]))
+    y.append((Bp[1]))
+    Ep = input("Ending Point :").split(",")
+    x.append(Ep[0])
+    y.append(Ep[1])
+  return l,x,y

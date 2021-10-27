@@ -183,12 +183,12 @@ def main(_argv):
       del memory[list(memory)[0]]
 
     # Draw total count.
-    y = 0.1 * frame.shape[0]
+    yy = 0.1 * frame.shape[0]
     for ll in range(l):
       cv2.putText(frame, "Total: {}".format(str(total_counter[ll])), (int(0.05 * frame.shape[1]), int(0.1 * frame.shape[0])), 0,
                 1.5e-3 * frame.shape[0], (0, 255, 255), 2)
-      y += 0.05 * frame.shape[0]
-    print("Total: ",total_counter)
+      yy += 0.05 * frame.shape[0]
+      print("Total: ",total_counter[ll])
     
     # display counts for each class as they appear
     for ll in range(l):

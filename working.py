@@ -131,7 +131,7 @@ def main(_argv):
     frameX = frame.shape[1] #640
     line = []
     for ll in range(l):
-      line_c = [int(float(x[ll*2]) * frameX), int(float(y[ll*2])* frameY)), (int(float(x[ll*2+1]) * frameX), int(float(y[ll*2+1]) * frameY))]
+      line_c = [(int(float(x[ll*2]) * frameX), int(float(y[ll*2])* frameY)), (int(float(x[ll*2+1]) * frameX), int(float(y[ll*2+1]) * frameY))]
       line.append(line_c)
     """
     line = [(int(0.2 * frameX), int(0.8 * frameY)), (int(0.55 * frameX), int(0.85 * frameY))]

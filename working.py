@@ -171,7 +171,7 @@ def main(_argv):
           """
           TC = CheckCrossLine.LineCrossing(midpoint, previous_midpoint, line[0] ,line[1])
           TC2 = CheckCrossLine.LineCrossing(midpoint, previous_midpoint, line2[0] ,line2[1])
-          """"
+          """
         
     # Delete memory of old tracks.
     # This needs to be larger than the number of tracked objects in the frame.  
@@ -187,7 +187,7 @@ def main(_argv):
     print("Total: ",total_counter)
     
     # display counts for each class as they appear
-    f for ll in range(l):
+    for ll in range(l):
       print("Road:" ,ll)
       for cls in class_counter[ll]:
         class_count = class_counter[cls]

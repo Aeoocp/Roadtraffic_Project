@@ -89,49 +89,50 @@ def main(_argv):
 
   while True:
     print("frame", frame_index+1)
+    
+    ret, frame = video_capture.read()  # frame shape 640*480*3
+
+    if ret != True:
+      break
+
+    t1 = time.time()
+
+    image = Image.fromarray(frame[..., ::-1])  # bgr to rgb
+    if frame_index+1 < len(boxes_s):
+      boxes = boxes_s[frame_index+1]
+      confidence = confidence_s[frame_index+1]
+      classes = classes_s[frame_index+1]
+
+    features = encoder(frame, boxes)
+    detections = [Detection(bbox, confidence, cls, feature) for bbox, confidence, cls, feature in
+                    zip(boxes, confidence, classes, features)]
+    # Run non-maxima suppression.
+    boxes = np.array([d.tlwh for d in detections])
+    scores = np.array([d.confidence for d in detections])
+    classes = np.array([d.cls for d in detections])
+    indices = preprocessing.non_max_suppression(boxes, nms_max_overlap, scores)
+    detections = [detections[i] for i in indices]
+
+    # Call the tracker
+    tracker.predict()
+    tracker.update(detections)
+
+    #สร้างและวาดเส้นผ่าน
+    frameY = frame.shape[0] #360
+    frameX = frame.shape[1] #640
+    line = []
+    for ll in range(l):
+      x1 = float(x[ll*2])
+      y1 = float(y[ll*2])
+      x2 = float(x[ll*2+1])
+      y2 = float(y[ll*2+1])
+      line_c = [(int(x1 * frameX), int(y1* frameY)), (int(x2 * frameX), int(y2 * frameY))]
+      line.append(line_c)
+    for ll in range(l):
+      line_o = line[ll]
+      cv2.line(frame, line_o[0], line_o[1], (255, 255, 255), 2)
+      
     if(frame_index%2 == 1):
-      ret, frame = video_capture.read()  # frame shape 640*480*3
-
-      if ret != True:
-        break
-
-      t1 = time.time()
-
-      image = Image.fromarray(frame[..., ::-1])  # bgr to rgb
-      if frame_index+1 < len(boxes_s):
-        boxes = boxes_s[frame_index+1]
-        confidence = confidence_s[frame_index+1]
-        classes = classes_s[frame_index+1]
-
-      features = encoder(frame, boxes)
-      detections = [Detection(bbox, confidence, cls, feature) for bbox, confidence, cls, feature in
-                      zip(boxes, confidence, classes, features)]
-      # Run non-maxima suppression.
-      boxes = np.array([d.tlwh for d in detections])
-      scores = np.array([d.confidence for d in detections])
-      classes = np.array([d.cls for d in detections])
-      indices = preprocessing.non_max_suppression(boxes, nms_max_overlap, scores)
-      detections = [detections[i] for i in indices]
-
-      # Call the tracker
-      tracker.predict()
-      tracker.update(detections)
-
-      #สร้างและวาดเส้นผ่าน
-      frameY = frame.shape[0] #360
-      frameX = frame.shape[1] #640
-      line = []
-      for ll in range(l):
-        x1 = float(x[ll*2])
-        y1 = float(y[ll*2])
-        x2 = float(x[ll*2+1])
-        y2 = float(y[ll*2+1])
-        line_c = [(int(x1 * frameX), int(y1* frameY)), (int(x2 * frameX), int(y2 * frameY))]
-        line.append(line_c)
-      for ll in range(l):
-        line_o = line[ll]
-        cv2.line(frame, line_o[0], line_o[1], (255, 255, 255), 2)
-
       for track in tracker.tracks:
         if not track.is_confirmed() or track.time_since_update > 1:
           continue

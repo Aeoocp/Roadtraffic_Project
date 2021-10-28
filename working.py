@@ -168,10 +168,10 @@ def main(_argv):
     # Draw total count.
     yy = 0.1 * frame.shape[0]
     for ll in range(l):
-      cv2.putText(frame, "Total: {}".format(str(total_counter[ll])), (int(0.05 * frame.shape[1]), int(yy)), 0,
+      xx = ll+1
+      cv2.putText(frame, "Total{}: {}".format(str(xx),str(total_counter[ll])), (int(0.05 * frame.shape[1]), int(yy)), 0,
                 1.5e-3 * frame.shape[0], (0, 255, 255), 2)
       yy += 0.1 * frame.shape[0]
-      xx = ll+1
       print("Total",xx,": ",total_counter[ll])
       
     cv2.putText(frame, "frame_index " + str(frame_index), (int(0.5 * frame.shape[1]), int(0.9 * frame.shape[0])), 0,

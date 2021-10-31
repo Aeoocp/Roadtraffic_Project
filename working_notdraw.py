@@ -166,15 +166,13 @@ def main(_argv):
     cv2.putText(frame, "frame_index " + str(frame_index), (int(0.5 * frame.shape[1]), int(0.9 * frame.shape[0])), 0,
                   1.5e-3 * frame.shape[0], (255, 255, 255), 2)
         
-    if writeVideo_flag:
-        # save a frame
-        out.write(frame)
-        frame_index = frame_index + 1
+    # save a frame
+    out.write(frame)
+    frame_index = frame_index + 1
 
     fps_imutils.update()
 
-    if not asyncVideo_flag:
-      fps = (fps + (1. / (time.time() - t1))) / 2
+    fps = (fps + (1. / (time.time() - t1))) / 2
 
     # Press Q to stop!
     if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -182,15 +180,8 @@ def main(_argv):
 
   fps_imutils.stop()
   print('imutils FPS: {}'.format(fps_imutils.fps()))
-
-  if asyncVideo_flag:
-    video_capture.stop()
-  else:
-    video_capture.release()
-
-  if writeVideo_flag:
-        out.release()
-
+  video_capture.release()
+  out.release()
   cv2.destroyAllWindows()
     
 if __name__ == '__main__':

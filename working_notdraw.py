@@ -50,10 +50,6 @@ def main(_argv):
   file_path = FLAGS.video
   video_capture = cv2.VideoCapture(file_path)
 
-  w = int(video_capture.get(3))
-  h = int(video_capture.get(4))
-  fourcc = cv2.VideoWriter_fourcc(*'XVID')
-  out = cv2.VideoWriter(FLAGS.output, fourcc, 30, (w, h))
   frame_index = -1
 
   fps = 0.0
@@ -163,8 +159,6 @@ def main(_argv):
     cv2.putText(frame, "frame_index " + str(frame_index), (int(0.5 * frame.shape[1]), int(0.9 * frame.shape[0])), 0,
                   1.5e-3 * frame.shape[0], (255, 255, 255), 2)
         
-    # save a frame
-    out.write(frame)
     frame_index = frame_index + 1
 
     fps_imutils.update()
@@ -178,7 +172,6 @@ def main(_argv):
   fps_imutils.stop()
   print('imutils FPS: {}'.format(fps_imutils.fps()))
   video_capture.release()
-  out.release()
   cv2.destroyAllWindows()
     
 if __name__ == '__main__':

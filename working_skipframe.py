@@ -33,8 +33,8 @@ import math
 warnings.filterwarnings('ignore')
 
 def main(_argv):
-  l,x,y = newLine.createLine()
-  classes_s,confidence_s,boxes_s = splitFile.spilttxt(FLAGS.text)
+  l,x,y = newLine.createLine()  #get lines position
+  classes_s,confidence_s,boxes_s = splitFile.spilttxt(FLAGS.text)   #get track imformation
   
   # Definition of the parameters
   max_cosine_distance = 0.3
@@ -43,8 +43,8 @@ def main(_argv):
 
   # Deep SORT
   model_filename = 'model_data/mars-small128.pb'
-  encoder = gdet.create_box_encoder(model_filename, batch_size=1)
-
+  encoder = gdet.create_box_encoder(model_filename, batch_size=1) #function
+  
   metric = nn_matching.NearestNeighborDistanceMetric("cosine", max_cosine_distance, nn_budget)
   tracker = Tracker(metric)
 

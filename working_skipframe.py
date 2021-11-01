@@ -140,7 +140,7 @@ def main(_argv):
       for track in tracker.tracks:
         if not track.is_confirmed() or track.time_since_update > 1:
           continue
-        bbox = track.to_tlbr()
+        bbox = track.to_tlbr()    # (min x, miny, max x, max y)
         track_cls = track.cls
 
         midpoint = track.tlbr_midpoint(bbox)

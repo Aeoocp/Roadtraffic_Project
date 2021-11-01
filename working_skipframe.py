@@ -86,7 +86,20 @@ def main(_argv):
     intersect_info.append([])
   already_counted = deque(maxlen=50) # temporary memory for storing counted IDs
   memory = {}
-
+  
+  ret, frame = video_capture.read()  # frame shape 640*480*3
+  #สร้างเส้นผ่าน
+  frameY = frame.shape[0] #360
+  frameX = frame.shape[1] #640
+  line = []
+  for ll in range(l):
+    x1 = float(x[ll*2])
+    y1 = float(y[ll*2])
+    x2 = float(x[ll*2+1])
+    y2 = float(y[ll*2+1])
+    line_c = [(int(x1 * frameX), int(y1* frameY)), (int(x2 * frameX), int(y2 * frameY))]
+    line.append(line_c)
+    
   while True:
     print("frame", frame_index+1)
     
@@ -116,24 +129,13 @@ def main(_argv):
       detections = [detections[i] for i in indices]
 
       # Call the tracker
-      tracker.predict()
+      tracker.predict()   # ได้ mean vector และ covariance matrix จาก Kalman filter prediction step
       tracker.update(detections)
 
-      #สร้างและวาดเส้นผ่าน
-      frameY = frame.shape[0] #360
-      frameX = frame.shape[1] #640
-      line = []
-      for ll in range(l):
-        x1 = float(x[ll*2])
-        y1 = float(y[ll*2])
-        x2 = float(x[ll*2+1])
-        y2 = float(y[ll*2+1])
-        line_c = [(int(x1 * frameX), int(y1* frameY)), (int(x2 * frameX), int(y2 * frameY))]
-        line.append(line_c)
+      #วาดเส้นผ่าน
       for ll in range(l):
         line_o = line[ll]
         cv2.line(frame, line_o[0], line_o[1], (255, 255, 255), 2)
-      
     
       for track in tracker.tracks:
         if not track.is_confirmed() or track.time_since_update > 1:

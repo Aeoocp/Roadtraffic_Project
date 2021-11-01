@@ -105,6 +105,7 @@ def main(_argv):
         classes = classes_s[frame_index+1]
 
       features = encoder(frame, boxes)
+      # represents a bounding box detection in a single image
       detections = [Detection(bbox, confidence, cls, feature) for bbox, confidence, cls, feature in
                       zip(boxes, confidence, classes, features)]
       # Run non-maxima suppression.

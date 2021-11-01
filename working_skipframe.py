@@ -108,10 +108,10 @@ def main(_argv):
       detections = [Detection(bbox, confidence, cls, feature) for bbox, confidence, cls, feature in
                       zip(boxes, confidence, classes, features)]
       # Run non-maxima suppression.
-      boxes = np.array([d.tlwh for d in detections])
-      scores = np.array([d.confidence for d in detections])
-      classes = np.array([d.cls for d in detections])
-      indices = preprocessing.non_max_suppression(boxes, nms_max_overlap, scores)
+      boxes = np.array([d.tlwh for d in detections])        # List ของ [x y w h] ในแต่ละเฟรม
+      scores = np.array([d.confidence for d in detections]) # confidence
+      classes = np.array([d.cls for d in detections])       # class
+      indices = preprocessing.non_max_suppression(boxes, nms_max_overlap, scores) 
       detections = [detections[i] for i in indices]
 
       # Call the tracker

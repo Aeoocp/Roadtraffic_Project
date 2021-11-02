@@ -102,7 +102,7 @@ def main(_argv):
       boxes = boxes_s[frame_index+1]
       confidence = confidence_s[frame_index+1]
       classes = classes_s[frame_index+1]
-
+    b_size = len(boxes)
     features = encoder(frame, boxes)
     detections = [Detection(bbox, confidence, cls, feature) for bbox, confidence, cls, feature in
                     zip(boxes, confidence, classes, features)]
@@ -131,8 +131,9 @@ def main(_argv):
     for ll in range(l):
       line_o = line[ll]
       cv2.line(frame, line_o[0], line_o[1], (255, 255, 255), 2)
-
+    bb_size = 0
     for track in tracker.tracks:
+      bb_size = bb_size+1
       if not track.is_confirmed() or track.time_since_update > 1:
         continue
       bbox = track.to_tlbr()
@@ -159,6 +160,14 @@ def main(_argv):
           already_counted.append(track.track_id)  # Set already counted for ID to true.
           intersection_time = datetime.datetime.now() - datetime.timedelta(microseconds=datetime.datetime.now().microsecond)
           intersect_info[ll].append([track_cls, origin_midpoint, intersection_time])
+        if track_cls == "car":
+          cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (0, 255, 0), 2)
+          cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1])), 0, 1.5e-3 * frame.shape[0], (0, 255, 0), 2)
+          cv2.putText(frame, str(track_cls), (int(bbox[0]), int(bbox[3])), 0, 1.5e-3 * frame.shape[0], (0, 255, 0), 2)
+        else:
+          cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (0, 0, 255), 2)
+          cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1]-25)), 0, 1.5e-3 * frame.shape[0], (0, 0, 255), 2)
+          cv2.putText(frame, str(track_cls), (int(bbox[0]), int(bbox[3])), 0, 1.5e-3 * frame.shape[0], (0, 0, 255), 2)
         
     # Delete memory of old tracks.
     # This needs to be larger than the number of tracked objects in the frame.  

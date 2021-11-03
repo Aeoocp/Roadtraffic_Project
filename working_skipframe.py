@@ -107,7 +107,9 @@ def main(_argv):
 
     if ret != True:
       break
-
+    
+    b_size = 0
+    bb_size = 0
     t1 = time.time()
     
     if(frame_index%2 == 1):
@@ -138,7 +140,6 @@ def main(_argv):
         line_o = line[ll]
         cv2.line(frame, line_o[0], line_o[1], (255, 255, 255), 2)
       
-      bb_size = 0
       for track in tracker.tracks:
         bb_size = bb_size+1
         if not track.is_confirmed() or track.time_since_update > 1:

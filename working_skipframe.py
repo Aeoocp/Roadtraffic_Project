@@ -107,6 +107,11 @@ def main(_argv):
 
     if ret != True:
       break
+ 
+    #วาดเส้นผ่าน
+    for ll in range(l):
+      line_o = line[ll]
+      cv2.line(frame, line_o[0], line_o[1], (255, 255, 255), 2)
     
     b_size = 0
     bb_size = 0
@@ -134,11 +139,6 @@ def main(_argv):
       # Call the tracker
       tracker.predict()   # ได้ mean vector และ covariance matrix จาก Kalman filter prediction step
       tracker.update(detections)
-
-      #วาดเส้นผ่าน
-      for ll in range(l):
-        line_o = line[ll]
-        cv2.line(frame, line_o[0], line_o[1], (255, 255, 255), 2)
       
       for track in tracker.tracks:
         bb_size = bb_size+1

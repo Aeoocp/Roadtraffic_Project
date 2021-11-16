@@ -53,8 +53,18 @@ def min_cost_matching(
     cost_matrix = distance_metric(
         tracks, detections, track_indices, detection_indices)
     cost_matrix[cost_matrix > max_distance] = max_distance + 1e-5
-    indices = linear_assignment(cost_matrix)
-
+    indices2 = linear_assignment(cost_matrix)
+    indices3 = []
+    Fr = 0
+    for frist in indices2:
+      coN = 0
+      for sec in frist:
+        if (Fr == 0):
+          indices3.append([])
+        indices3[coN].append(sec)
+        coN = coN+1
+      Fr = Fr+1
+    indices = np.array(indices3)
 
     matches, unmatched_tracks, unmatched_detections = [], [], []
     for col, detection_idx in enumerate(detection_indices):

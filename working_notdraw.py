@@ -56,8 +56,6 @@ def main(_argv):
 
   fps = 0.0
   fps_imutils = imutils.video.FPS().start()
-  current_date = datetime.datetime.now().date()
-  count_dict = {}
   
   total_counter = []
   class_counter = []  # store counts of each detected class

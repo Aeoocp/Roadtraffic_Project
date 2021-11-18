@@ -34,7 +34,7 @@ warnings.filterwarnings('ignore')
 
 def main(_argv):
   l,x,y = newLine.createLine()  #get lines position
-  classes_s,confidence_s,boxes_s = splitFile.spilttxt(FLAGS.text)   #get track imformation
+  classes_s,confidence_s,boxes_s = splitFile.spilttxt(FLAGS.text)   #get track information
   
   # Definition of the parameters
   max_cosine_distance = 0.3

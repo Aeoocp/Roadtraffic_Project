@@ -150,11 +150,10 @@ def main(_argv):
         origin_midpoint = (midpoint[0], frame.shape[0] - midpoint[1])
 
         if track.track_id not in memory:
-          memory[track.track_id] = deque(maxlen=2)  
+          memory[track.track_id] = deque(maxlen=5)  
 
         memory[track.track_id].append(midpoint)
         previous_midpoint = memory[track.track_id][0]
-        origin_previous_midpoint = (previous_midpoint[0], frame.shape[0] - previous_midpoint[1])
         for ll in range(l):
           line_o = line[ll]
           TC = CheckCrossLine.LineCrossing(midpoint, previous_midpoint, line_o[0] ,line_o[1])

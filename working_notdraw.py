@@ -46,14 +46,8 @@ def main(_argv):
   metric = nn_matching.NearestNeighborDistanceMetric("cosine", max_cosine_distance, nn_budget)
   tracker = Tracker(metric)
 
-  show_detections = True
-  asyncVideo_flag = False
-
   file_path = FLAGS.video
   video_capture = cv2.VideoCapture(file_path)
-
-  if asyncVideo_flag:
-    video_capture.start()
 
   w = int(video_capture.get(3))
   h = int(video_capture.get(4))
@@ -161,11 +155,8 @@ def main(_argv):
       print("Total",xx,": ",total_counter[ll])
         
     frame_index = frame_index + 1
-
     fps_imutils.update()
-
-    if not asyncVideo_flag:
-      fps = (fps + (1. / (time.time() - t1))) / 2
+    fps = (fps + (1. / (time.time() - t1))) / 2
 
     # Press Q to stop!
     if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -174,10 +165,7 @@ def main(_argv):
   fps_imutils.stop()
   print('imutils FPS: {}'.format(fps_imutils.fps()))
 
-  if asyncVideo_flag:
-    video_capture.stop()
-  else:
-    video_capture.release()
+  video_capture.release()
 
   cv2.destroyAllWindows()
     

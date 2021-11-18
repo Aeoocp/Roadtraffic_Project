@@ -51,7 +51,6 @@ def main(_argv):
 
   w = int(video_capture.get(3))
   h = int(video_capture.get(4))
-  fourcc = cv2.VideoWriter_fourcc(*'XVID')
   frame_index = -1
 
   fps = 0.0

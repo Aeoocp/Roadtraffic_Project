@@ -79,11 +79,9 @@ def main(_argv):
   
   total_counter = []
   class_counter = []  # store counts of each detected class
-  intersect_info = [] # initialise intersection list
   for ll in range(l):
     total_counter.append(0)
     class_counter.append(Counter())
-    intersect_info.append([])
   already_counted = deque(maxlen=50) # temporary memory for storing counted IDs
   memory = {}
   
@@ -164,8 +162,6 @@ def main(_argv):
             class_counter[ll][track_cls] += 1
             total_counter[ll] += 1
             already_counted.append(track.track_id)  # Set already counted for ID to true.
-            intersection_time = datetime.datetime.now() - datetime.timedelta(microseconds=datetime.datetime.now().microsecond)
-            intersect_info[ll].append([track_cls, origin_midpoint, intersection_time])
 
     # Delete memory of old tracks.
     # This needs to be larger than the number of tracked objects in the frame.  

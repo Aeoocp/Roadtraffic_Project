@@ -11,8 +11,6 @@ from absl import app, flags, logging
 from absl.flags import FLAGS
 flags.DEFINE_string('text','/content/Traffic_counting/input_txt/hlp/080841-03.txt','input text')
 flags.DEFINE_string('video', '/content/Traffic_counting/video/hlp/080841-03.mkv', 'path to input video or set to 0 for webcam')
-flags.DEFINE_string('output', '/content/Traffic_counting/output.avi', 'path to output video')
-flags.DEFINE_string('output_format', 'XVID', 'codec used in VideoWriter when saving video to file')
 
 from deep_sort import preprocessing
 from deep_sort import nn_matching
@@ -49,28 +47,18 @@ def main(_argv):
   tracker = Tracker(metric)
 
   show_detections = True
-  writeVideo_flag = True
   asyncVideo_flag = False
 
   file_path = FLAGS.video
-  if asyncVideo_flag:
-    video_capture = VideoCaptureAsync(file_path)  
-  else:
-    video_capture = cv2.VideoCapture(file_path)
+  video_capture = cv2.VideoCapture(file_path)
 
   if asyncVideo_flag:
     video_capture.start()
 
-  if writeVideo_flag:
-    if asyncVideo_flag:
-      w = int(video_capture.cap.get(3))
-      h = int(video_capture.cap.get(4))
-    else:
-      w = int(video_capture.get(3))
-      h = int(video_capture.get(4))
-    fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    out = cv2.VideoWriter(FLAGS.output, fourcc, 30, (w, h))
-    frame_index = -1
+  w = int(video_capture.get(3))
+  h = int(video_capture.get(4))
+  fourcc = cv2.VideoWriter_fourcc(*'XVID')
+  frame_index = -1
 
   fps = 0.0
   fps_imutils = imutils.video.FPS().start()
@@ -172,10 +160,7 @@ def main(_argv):
       xx = ll+1
       print("Total",xx,": ",total_counter[ll])
         
-    if writeVideo_flag:
-        # save a frame
-        out.write(frame)
-        frame_index = frame_index + 1
+    frame_index = frame_index + 1
 
     fps_imutils.update()
 
@@ -193,9 +178,6 @@ def main(_argv):
     video_capture.stop()
   else:
     video_capture.release()
-
-  if writeVideo_flag:
-        out.release()
 
   cv2.destroyAllWindows()
     

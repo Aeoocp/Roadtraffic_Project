@@ -34,7 +34,7 @@ warnings.filterwarnings('ignore')
 
 def main(_argv):
   l,x,y = newLine.createLine()  #get lines position
-  classes_s,confidence_s,boxes_s = splitFile.spilttxt(FLAGS.text)   #get track information
+  classes_s,confidence_s,boxes_s = splitFile.spilttxt(FLAGS.text)   #get track imformation
   
   # Definition of the parameters
   max_cosine_distance = 0.3
@@ -107,67 +107,80 @@ def main(_argv):
 
     if ret != True:
       break
+ 
+    #วาดเส้นผ่าน
+    for ll in range(l):
+      line_o = line[ll]
+      cv2.line(frame, line_o[0], line_o[1], (255, 255, 255), 2)
     
     b_size = 0
     bb_size = 0
     t1 = time.time()
     
-    if(frame_index%2 != 1):
-      continue
-    image = Image.fromarray(frame[..., ::-1])  # bgr to rgb
-    if frame_index+1 < len(boxes_s):
-      boxes = boxes_s[frame_index+1]
-      confidence = confidence_s[frame_index+1]
-      classes = classes_s[frame_index+1]
-    b_size = len(boxes)
+    if(frame_index%2 == 1):
+      image = Image.fromarray(frame[..., ::-1])  # bgr to rgb
+      if frame_index+1 < len(boxes_s):
+        boxes = boxes_s[frame_index+1]
+        confidence = confidence_s[frame_index+1]
+        classes = classes_s[frame_index+1]
+      b_size = len(boxes)
 
-    features = encoder(frame, boxes)
-    # represents a bounding box detection in a single image
-    detections = [Detection(bbox, confidence, cls, feature) for bbox, confidence, cls, feature in
-                    zip(boxes, confidence, classes, features)]
-    # Run non-maxima suppression.
-    boxes = np.array([d.tlwh for d in detections])        # List ของ [x y w h] ในแต่ละเฟรม
-    scores = np.array([d.confidence for d in detections]) # confidence
-    classes = np.array([d.cls for d in detections])       # class
-    indices = preprocessing.non_max_suppression(boxes, nms_max_overlap, scores) #กรองเฟรมที่ซ้อนทับกันออก
-    detections = [detections[i] for i in indices]
+      features = encoder(frame, boxes)
+      # represents a bounding box detection in a single image
+      detections = [Detection(bbox, confidence, cls, feature) for bbox, confidence, cls, feature in
+                      zip(boxes, confidence, classes, features)]
+      # Run non-maxima suppression.
+      boxes = np.array([d.tlwh for d in detections])        # List ของ [x y w h] ในแต่ละเฟรม
+      scores = np.array([d.confidence for d in detections]) # confidence
+      classes = np.array([d.cls for d in detections])       # class
+      indices = preprocessing.non_max_suppression(boxes, nms_max_overlap, scores) #กรองเฟรมที่ซ้อนทับกันออก
+      detections = [detections[i] for i in indices]
 
-    # Call the tracker
-    tracker.predict()   # ได้ mean vector และ covariance matrix จาก Kalman filter prediction step
-    tracker.update(detections)
+      # Call the tracker
+      tracker.predict()   # ได้ mean vector และ covariance matrix จาก Kalman filter prediction step
+      tracker.update(detections)
+      
+      for track in tracker.tracks:
+        bb_size = bb_size+1
+        if not track.is_confirmed() or track.time_since_update > 1:
+          continue
+        bbox = track.to_tlbr()    # (min x, miny, max x, max y)
+        track_cls = track.cls
 
-    for track in tracker.tracks:
-      bb_size = bb_size+1
-      if not track.is_confirmed() or track.time_since_update > 1:
-        continue
-      bbox = track.to_tlbr()    # (min x, miny, max x, max y)
-      track_cls = track.cls
+        midpoint = track.tlbr_midpoint(bbox)
+        # get midpoint respective to botton-left
+        origin_midpoint = (midpoint[0], frame.shape[0] - midpoint[1])
 
-      midpoint = track.tlbr_midpoint(bbox)
-      # get midpoint respective to botton-left
-      origin_midpoint = (midpoint[0], frame.shape[0] - midpoint[1])
+        if track.track_id not in memory:
+          memory[track.track_id] = deque(maxlen=2)  
 
-      if track.track_id not in memory:
-        memory[track.track_id] = deque(maxlen=2)  
-
-      memory[track.track_id].append(midpoint)
-      previous_midpoint = memory[track.track_id][0]
-      origin_previous_midpoint = (previous_midpoint[0], frame.shape[0] - previous_midpoint[1])
-      for ll in range(l):
-        line_o = line[ll]
-        TC = CheckCrossLine.LineCrossing(midpoint, previous_midpoint, line_o[0] ,line_o[1])
-        if TC and (track.track_id not in already_counted):
-          class_counter[ll][track_cls] += 1
-          total_counter[ll] += 1
-          # draw alert line
-          already_counted.append(track.track_id)  # Set already counted for ID to true.
-          intersection_time = datetime.datetime.now() - datetime.timedelta(microseconds=datetime.datetime.now().microsecond)
-          intersect_info[ll].append([track_cls, origin_midpoint, intersection_time])
+        memory[track.track_id].append(midpoint)
+        previous_midpoint = memory[track.track_id][0]
+        origin_previous_midpoint = (previous_midpoint[0], frame.shape[0] - previous_midpoint[1])
+        for ll in range(l):
+          line_o = line[ll]
+          TC = CheckCrossLine.LineCrossing(midpoint, previous_midpoint, line_o[0] ,line_o[1])
+          if TC and (track.track_id not in already_counted):
+            class_counter[ll][track_cls] += 1
+            total_counter[ll] += 1
+            already_counted.append(track.track_id)  # Set already counted for ID to true.
+            intersection_time = datetime.datetime.now() - datetime.timedelta(microseconds=datetime.datetime.now().microsecond)
+            intersect_info[ll].append([track_cls, origin_midpoint, intersection_time])
 
     # Delete memory of old tracks.
     # This needs to be larger than the number of tracked objects in the frame.  
     if len(memory) > 50:
       del memory[list(memory)[0]]
+
+    # Draw total count.
+    for ll in range(l):
+      xx = ll+1
+      print("Total",xx,": ",total_counter[ll])
+        
+    if writeVideo_flag:
+        # save a frame
+        out.write(frame)
+        frame_index = frame_index + 1
 
     fps_imutils.update()
 

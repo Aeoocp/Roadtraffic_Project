@@ -34,7 +34,7 @@ class Tracker:
         The list of active tracks at the current time step.
     """
 
-    def __init__(self, metric, max_iou_distance=0.7, max_age=30, n_init=3, adc_threshold=0.5):
+    def __init__(self, metric, max_iou_distance=0.95, max_age=50, n_init=1, adc_threshold=0.5):
         self.metric = metric
         self.max_iou_distance = max_iou_distance
         self.max_age = max_age

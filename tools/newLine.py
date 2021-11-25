@@ -12,3 +12,24 @@ def createLine():
     x.append(Ep[0])
     y.append(Ep[1])
   return numLine,x,y
+
+def createLineSpeed():
+  numLine = int(input("Enter number of counting line :"))
+  x1 = []
+  y1 = []
+  x2 = []
+  y2 = []
+  print("Enter the beginning and ending of the line (0-1) (x,y) :")
+  Bp = input("First Point Line1 :").split(",")
+  x.append((Bp[0]))
+  y.append((Bp[1]))
+  Ep = input("End Point Line1:").split(",")
+  x.append(Ep[0])
+  y.append(Ep[1])
+  Bp = input("First Point Line2 :").split(",")
+  x2.append((Bp[0]))
+  y2.append((Bp[1]))
+  Ep = input("End Point Line2:").split(",")
+  x2.append(Ep[0])
+  y2.append(Ep[1])
+  return x1,y1,x2,y2

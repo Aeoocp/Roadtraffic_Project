@@ -117,7 +117,7 @@ def main(_argv):
     bb_size = 0
     t1 = time.time()
     
-    if(frame_index%2 == 1):
+    if(frame_index%3 == 1):
       image = Image.fromarray(frame[..., ::-1])  # bgr to rgb
       if frame_index+1 < len(boxes_s):
         boxes = boxes_s[frame_index+1]

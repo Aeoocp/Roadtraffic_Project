@@ -33,7 +33,7 @@ import math
 warnings.filterwarnings('ignore')
 
 def main(_argv):
-  l,x,y = newLine.createLine()  #get lines position
+  l,x,y = newLine.createLine2()  #get lines position
   classes_s,confidence_s,boxes_s = splitFile.spilttxt(FLAGS.text)   #get track imformation
   
   # Definition of the parameters

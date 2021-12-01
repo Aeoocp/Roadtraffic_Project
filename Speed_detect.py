@@ -33,7 +33,7 @@ import math
 warnings.filterwarnings('ignore')
 
 def main(_argv):
-  x1,y1,x2,y2 = newLine.createLineSpeed()  #get lines position
+  x1,y1,x2,y2 = newLine.createLineSpeed2()  #get lines position
   classes_s,confidence_s,boxes_s = splitFile.spilttxt(FLAGS.text)   #get track imformation
   
   # Definition of the parameters
@@ -84,21 +84,29 @@ def main(_argv):
     total_counter.append(0)
     class_counter.append(Counter())
     intersect_info.append([])
-  already_counted = deque(maxlen=50) # temporary memory for storing counted IDs
+  already_counted1 = deque(maxlen=50) # temporary memory for storing counted IDs forLine1
+  already_counted2 = deque(maxlen=50) # temporary memory for storing counted IDs forLine2
   memory = {}
   
   ret, frame = video_capture.read()  # frame shape 640*480*3
   #สร้างเส้นผ่าน
   frameY = frame.shape[0] #360
   frameX = frame.shape[1] #640
-  line = []
+  line1 = []
+  line2 = []
   for ll in range(l):
-    x1 = float(x[ll*2])
-    y1 = float(y[ll*2])
-    x2 = float(x[ll*2+1])
-    y2 = float(y[ll*2+1])
-    line_c = [(int(x1 * frameX), int(y1* frameY)), (int(x2 * frameX), int(y2 * frameY))]
-    line.append(line_c)
+    xb1 = float(x1[ll*2])
+    yb1 = float(y2[ll*2])
+    xe1 = float(x1[ll*2+1])
+    ye1 = float(y2[ll*2+1])
+    line_c1 = [(int(xb1 * frameX), int(yb1* frameY)), (int(xe1 * frameX), int(ye1 * frameY))]
+    line1.append(line_c1)
+    xb2 = float(x1[ll*2])
+    yb2 = float(y2[ll*2])
+    xe2 = float(x1[ll*2+1])
+    ye2 = float(y2[ll*2+1])
+    line_c2 = [(int(xb2 * frameX), int(yb2* frameY)), (int(xe2 * frameX), int(ye2 * frameY))]
+    line2.append(line_c2)
     
   while True:
     print("frame", frame_index+1)
@@ -117,68 +125,78 @@ def main(_argv):
     bb_size = 0
     t1 = time.time()
     
-    if(frame_index%3 == 1):
-      image = Image.fromarray(frame[..., ::-1])  # bgr to rgb
-      if frame_index+1 < len(boxes_s):
-        boxes = boxes_s[frame_index+1]
-        confidence = confidence_s[frame_index+1]
-        classes = classes_s[frame_index+1]
-      b_size = len(boxes)
+    image = Image.fromarray(frame[..., ::-1])  # bgr to rgb
+    if frame_index+1 < len(boxes_s):
+      boxes = boxes_s[frame_index+1]
+      confidence = confidence_s[frame_index+1]
+      classes = classes_s[frame_index+1]
+    b_size = len(boxes)
 
-      features = encoder(frame, boxes)
-      # represents a bounding box detection in a single image
-      detections = [Detection(bbox, confidence, cls, feature) for bbox, confidence, cls, feature in
-                      zip(boxes, confidence, classes, features)]
-      # Run non-maxima suppression.
-      boxes = np.array([d.tlwh for d in detections])        # List ของ [x y w h] ในแต่ละเฟรม
-      scores = np.array([d.confidence for d in detections]) # confidence
-      classes = np.array([d.cls for d in detections])       # class
-      indices = preprocessing.non_max_suppression(boxes, nms_max_overlap, scores) #กรองเฟรมที่ซ้อนทับกันออก
-      detections = [detections[i] for i in indices]
+    features = encoder(frame, boxes)
+    # represents a bounding box detection in a single image
+    detections = [Detection(bbox, confidence, cls, feature) for bbox, confidence, cls, feature in
+                    zip(boxes, confidence, classes, features)]
+    # Run non-maxima suppression.
+    boxes = np.array([d.tlwh for d in detections])        # List ของ [x y w h] ในแต่ละเฟรม
+    scores = np.array([d.confidence for d in detections]) # confidence
+    classes = np.array([d.cls for d in detections])       # class
+    indices = preprocessing.non_max_suppression(boxes, nms_max_overlap, scores) #กรองเฟรมที่ซ้อนทับกันออก
+    detections = [detections[i] for i in indices]
 
-      # Call the tracker
-      tracker.predict()   # ได้ mean vector และ covariance matrix จาก Kalman filter prediction step
-      tracker.update(detections)
-      
-      for track in tracker.tracks:
-        bb_size = bb_size+1
-        if not track.is_confirmed() or track.time_since_update > 1:
-          continue
-        bbox = track.to_tlbr()    # (min x, miny, max x, max y)
-        track_cls = track.cls
+    # Call the tracker
+    tracker.predict()   # ได้ mean vector และ covariance matrix จาก Kalman filter prediction step
+    tracker.update(detections)
 
-        midpoint = track.tlbr_midpoint(bbox)
-        # get midpoint respective to botton-left
-        origin_midpoint = (midpoint[0], frame.shape[0] - midpoint[1])
+    for track in tracker.tracks:
+      bb_size = bb_size+1
+      if not track.is_confirmed() or track.time_since_update > 1:
+        continue
+      bbox = track.to_tlbr()    # (min x, miny, max x, max y)
+      track_cls = track.cls
 
-        if track.track_id not in memory:
-          memory[track.track_id] = deque(maxlen=2)  
+      midpoint = track.tlbr_midpoint(bbox)
+      # get midpoint respective to botton-left
+      origin_midpoint = (midpoint[0], frame.shape[0] - midpoint[1])
 
-        memory[track.track_id].append(midpoint)
-        previous_midpoint = memory[track.track_id][0]
-        origin_previous_midpoint = (previous_midpoint[0], frame.shape[0] - previous_midpoint[1])
-        for ll in range(l):
-          line_o = line[ll]
-          TC = CheckCrossLine.LineCrossing(midpoint, previous_midpoint, line_o[0] ,line_o[1])
-          if TC and (track.track_id not in already_counted):
-            class_counter[ll][track_cls] += 1
-            total_counter[ll] += 1
-            # draw alert line
-            cv2.line(frame, line_o[0], line_o[1], (0, 0, 255), 2)
-            already_counted.append(track.track_id)  # Set already counted for ID to true.
-            intersection_time = datetime.datetime.now() - datetime.timedelta(microseconds=datetime.datetime.now().microsecond)
-            intersect_info[ll].append([track_cls, origin_midpoint, intersection_time])
-        if track_cls == "car":
-          cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (0, 255, 0), 2)
-          cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1])), 0, 1.5e-3 * frame.shape[0], (0, 255, 0), 2)
-          cv2.putText(frame, str(track_cls), (int(bbox[0]), int(bbox[3])), 0, 1.5e-3 * frame.shape[0], (0, 255, 0), 2)
-        else:
-          cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (0, 0, 255), 2)
-          cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1]-25)), 0, 1.5e-3 * frame.shape[0], (0, 0, 255), 2)
-          cv2.putText(frame, str(track_cls), (int(bbox[0]), int(bbox[3])), 0, 1.5e-3 * frame.shape[0], (0, 0, 255), 2)
+      if track.track_id not in memory:
+        memory[track.track_id] = deque(maxlen=2)  
 
-      # Delete memory of old tracks.
-      # This needs to be larger than the number of tracked objects in the frame.  
+      memory[track.track_id].append(midpoint)
+      previous_midpoint = memory[track.track_id][0]
+      origin_previous_midpoint = (previous_midpoint[0], frame.shape[0] - previous_midpoint[1])
+      for ll in range(l):
+        line_o = line1[ll]
+        TC1 = CheckCrossLine.LineCrossing(midpoint, previous_midpoint, line_o[0] ,line_o[1])
+        if TC1 and (track.track_id not in already_counted1):
+          class_counter[ll][track_cls] += 1
+          total_counter[ll] += 1
+          # draw alert line
+          cv2.line(frame, line_o[0], line_o[1], (0, 0, 255), 2)
+          already_counted1.append(track.track_id)  # Set already counted for ID to true.
+          intersection_time = datetime.datetime.now() - datetime.timedelta(microseconds=datetime.datetime.now().microsecond)
+          intersect_info[ll].append([track_cls, origin_midpoint, intersection_time])
+        line_o = line1[ll]
+        TC2 = CheckCrossLine.LineCrossing(midpoint, previous_midpoint, line_o[0] ,line_o[1])
+        if TC2 and (track.track_id not in already_counted2):
+          class_counter[ll][track_cls] += 1
+          total_counter[ll] += 1
+          # draw alert line
+          cv2.line(frame, line_o[0], line_o[1], (0, 0, 255), 2)
+          already_counted2.append(track.track_id)  # Set already counted for ID to true.
+          intersection_time = datetime.datetime.now() - datetime.timedelta(microseconds=datetime.datetime.now().microsecond)
+          intersect_info[ll].append([track_cls, origin_midpoint, intersection_time])
+          
+      if track_cls == "car":
+        cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (0, 255, 0), 2)
+        cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1])), 0, 1.5e-3 * frame.shape[0], (0, 255, 0), 2)
+        cv2.putText(frame, str(track_cls), (int(bbox[0]), int(bbox[3])), 0, 1.5e-3 * frame.shape[0], (0, 255, 0), 2)
+      else:
+        cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (0, 0, 255), 2)
+        cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1]-25)), 0, 1.5e-3 * frame.shape[0], (0, 0, 255), 2)
+        cv2.putText(frame, str(track_cls), (int(bbox[0]), int(bbox[3])), 0, 1.5e-3 * frame.shape[0], (0, 0, 255), 2)
+
+    # Delete memory of old tracks.
+    # This needs to be larger than the number of tracked objects in the frame.  
     if len(memory) > 50:
       del memory[list(memory)[0]]
 

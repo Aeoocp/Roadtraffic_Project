@@ -94,6 +94,7 @@ def main(_argv):
   frameX = frame.shape[1] #640
   line1 = []
   line2 = []
+  SaveFrame = []
   for ll in range(l):
     xb1 = float(x1[ll*2])
     yb1 = float(y2[ll*2])

@@ -230,7 +230,7 @@ def main(_argv):
     cv2.putText(frame, "frame_index {}".format(str(frame_index+1)), (int(0.5 * frame.shape[1]), int(0.9 * frame.shape[0])), 0,
                   1.5e-3 * frame.shape[0], (255, 255, 255), 2)
     
-    speed_size = speed_avg_list.size();
+    speed_size = len(speed_avg_list)
     sum = 0
     for s in speed_avg_list:
       sum += int(s) 

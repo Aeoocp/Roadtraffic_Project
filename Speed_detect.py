@@ -33,7 +33,7 @@ import math
 warnings.filterwarnings('ignore')
 
 def main(_argv):
-  x1,y1,x2,y2 = newLine.createLineSpeed2()  #get lines position
+  l,x1,y1,x2,y2 = newLine.createLineSpeed2()  #get lines position
   classes_s,confidence_s,boxes_s = splitFile.spilttxt(FLAGS.text)   #get track imformation
   
   # Definition of the parameters
@@ -89,6 +89,7 @@ def main(_argv):
   speed_mem = {}
   speed_avg_list = []
   speed_avg_memo = []
+  speed_avg = 0
   
   ret, frame = video_capture.read()  # frame shape 640*480*3
   #สร้างเส้นผ่าน
@@ -113,7 +114,7 @@ def main(_argv):
   while True:
     print("frame", frame_index+1)
     if ((frame_index+1)%600==0):
-      speed_avg_memo.append(speed_avg):
+      speed_avg_memo.append(speed_avg)
       speed_avg_list = []
     ret, frame = video_capture.read()  # frame shape 640*480*3
 
@@ -122,8 +123,10 @@ def main(_argv):
  
     #วาดเส้นผ่าน
     for ll in range(l):
-      line_o = line[ll]
-      cv2.line(frame, line_o[0], line_o[1], (255, 255, 255), 2)
+      line_1 = line1[ll]
+      cv2.line(frame, line_1[0], line_1[1], (255, 255, 255), 2)
+      line_2 = line2[ll]
+      cv2.line(frame, line_2[0], line_2[1], (255, 255, 255), 2)
     
     b_size = 0
     t1 = time.time()

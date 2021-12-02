@@ -54,7 +54,7 @@ def createLineSpeed2():
   y1 = []
   x2 = []
   y2 = []
-  print("Enter the beginning and ending of two line (0-1) (xb1,yb1,xe1,ye1,xb2,yb2,xe2,ye2) :")
+  print("Enter the beginning and ending of two line (0-1) (xb1,yb1,xe1,ye1,xb2,yb2,xe2,ye2)")
   for l in range(numLine):
     print("Line",l+1)
     Bp = input("Enter line position :").split(",")

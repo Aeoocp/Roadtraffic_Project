@@ -66,4 +66,4 @@ def createLineSpeed2():
     y2.append((Bp[5]))
     x2.append((Bp[6]))
     y2.append((Bp[7]))
-  return x1,y1,x2,y2
+  return numLine,x1,y1,x2,y2

@@ -196,13 +196,14 @@ def main(_argv):
           already_counted2.append(track.track_id)  # Set already counted for ID to true.
           intersection_time = datetime.datetime.now() - datetime.timedelta(microseconds=datetime.datetime.now().microsecond)
           intersect_info[ll].append([track_cls, origin_midpoint, intersection_time])
-          
-          trackTime1 = speed_mem[track.track_id].popleft()
-          trackTime2 = speed_mem[track.track_id].popleft()
-          distance = 4.5 #ระยะทางหน่วยเมตร 
-          time_tract = (trackTime2-trackTime1)/30 #เวลาในหน่วยวินาที
-          speed = distance/time_tract
-          speed_avg_list.append(speed)
+        
+        print(tpye(speed_mem[track.track_id]))
+        trackTime1 = speed_mem[track.track_id].popleft()
+        trackTime2 = speed_mem[track.track_id].popleft()
+        distance = 4.5 #ระยะทางหน่วยเมตร 
+        time_tract = (trackTime2-trackTime1)/30 #เวลาในหน่วยวินาที
+        speed = distance/time_tract
+        speed_avg_list.append(speed)
           
       if track_cls == "car":
         cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (0, 255, 0), 2)
@@ -234,7 +235,8 @@ def main(_argv):
     sum = 0
     for s in speed_avg_list:
       sum += int(s) 
-    speed_avg = sum/speed_size
+    if(speed_size != 0):
+      speed_avg = sum/speed_size
     print("speed_avg : ",speed_avg)
     
     if writeVideo_flag:

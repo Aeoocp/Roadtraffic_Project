@@ -99,14 +99,14 @@ def main(_argv):
   line2 = []
   for ll in range(l):
     xb1 = float(x1[ll*2])
-    yb1 = float(y2[ll*2])
+    yb1 = float(y1[ll*2])
     xe1 = float(x1[ll*2+1])
-    ye1 = float(y2[ll*2+1])
+    ye1 = float(y1[ll*2+1])
     line_c1 = [(int(xb1 * frameX), int(yb1* frameY)), (int(xe1 * frameX), int(ye1 * frameY))]
     line1.append(line_c1)
-    xb2 = float(x1[ll*2])
+    xb2 = float(x2[ll*2])
     yb2 = float(y2[ll*2])
-    xe2 = float(x1[ll*2+1])
+    xe2 = float(x2[ll*2+1])
     ye2 = float(y2[ll*2+1])
     line_c2 = [(int(xb2 * frameX), int(yb2* frameY)), (int(xe2 * frameX), int(ye2 * frameY))]
     line2.append(line_c2)
@@ -197,7 +197,7 @@ def main(_argv):
           intersection_time = datetime.datetime.now() - datetime.timedelta(microseconds=datetime.datetime.now().microsecond)
           intersect_info[ll].append([track_cls, origin_midpoint, intersection_time])
         
-        print(tpye(speed_mem[track.track_id]))
+        print(type(speed_mem[track.track_id]))
         trackTime1 = speed_mem[track.track_id].popleft()
         trackTime2 = speed_mem[track.track_id].popleft()
         distance = 4.5 #ระยะทางหน่วยเมตร 

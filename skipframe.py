@@ -113,8 +113,6 @@ def main(_argv):
       line_o = line[ll]
       cv2.line(frame, line_o[0], line_o[1], (255, 255, 255), 2)
     
-    b_size = 0
-    bb_size = 0
     t1 = time.time()
     
     if(frame_index%3 == 1):
@@ -123,7 +121,6 @@ def main(_argv):
         boxes = boxes_s[frame_index+1]
         confidence = confidence_s[frame_index+1]
         classes = classes_s[frame_index+1]
-      b_size = len(boxes)
 
       features = encoder(frame, boxes)
       # represents a bounding box detection in a single image
@@ -141,7 +138,6 @@ def main(_argv):
       tracker.update(detections)
       
       for track in tracker.tracks:
-        bb_size = bb_size+1
         if not track.is_confirmed() or track.time_since_update > 1:
           continue
         bbox = track.to_tlbr()    # (min x, miny, max x, max y)
@@ -191,7 +187,7 @@ def main(_argv):
       yy += 0.1 * frame.shape[0]
       print("Total",xx,": ",total_counter[ll])
       
-    cv2.putText(frame, "bf{} af{} frame_index {}".format(str(b_size),str(bb_size),str(frame_index)), (int(0.5 * frame.shape[1]), int(0.9 * frame.shape[0])), 0,
+    cv2.putText(frame, "frame_index {}".format(str(frame_index)), (int(0.75 * frame.shape[1]), int(0.9 * frame.shape[0])), 0,
                   1.5e-3 * frame.shape[0], (255, 255, 255), 2)
         
     if writeVideo_flag:

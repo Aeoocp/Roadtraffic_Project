@@ -87,9 +87,7 @@ def main(_argv):
   already_counted2 = deque(maxlen=50) # temporary memory for storing counted IDs forLine2
   memory = {}
   speed_mem = {}
-  speed_avg_list = []
-  speed_avg_memo = []
-  speed_avg = 0
+  speed_list = []   # store final speed
   
   ret, frame = video_capture.read()  # frame shape 640*480*3
   #สร้างเส้นผ่าน
@@ -113,9 +111,6 @@ def main(_argv):
     
   while True:
     print("frame", frame_index+1)
-    if ((frame_index+1)%600==0):
-      speed_avg_memo.append(speed_avg)
-      speed_avg_list = []
     ret, frame = video_capture.read()  # frame shape 640*480*3
 
     if ret != True:
@@ -187,7 +182,7 @@ def main(_argv):
         line_o = line2[ll]
         TC2 = CheckCrossLine.LineCrossing(midpoint, previous_midpoint, line_o[0] ,line_o[1])
         if TC2 and (track.track_id not in already_counted2):
-          if track.track_id not in speed_mem:
+          if track.track_id in speed_mem:
             speed_mem[track.track_id].append(frame_index+1)
           class_counter[ll][track_cls] += 1
           total_counter[ll] += 1
@@ -197,13 +192,14 @@ def main(_argv):
           intersection_time = datetime.datetime.now() - datetime.timedelta(microseconds=datetime.datetime.now().microsecond)
           intersect_info[ll].append([track_cls, origin_midpoint, intersection_time])
         
-        print(type(speed_mem[track.track_id]))
-        trackTime1 = speed_mem[track.track_id].popleft()
-        trackTime2 = speed_mem[track.track_id].popleft()
-        distance = 4.5 #ระยะทางหน่วยเมตร 
-        time_tract = (trackTime2-trackTime1)/30 #เวลาในหน่วยวินาที
-        speed = distance/time_tract
-        speed_avg_list.append(speed)
+        if(len(speed_mem[track.track_id])==2):
+          trackTime1 = speed_mem[track.track_id].popleft()
+          trackTime2 = speed_mem[track.track_id].popleft()
+          distance = 4.5 #ระยะทางหน่วยเมตร 
+          time_tract = (trackTime2-trackTime1)/30 #เวลาที่จับได้ในหน่วยวินาที
+          speed = (distance/time_tract)*3.6 #คำนวณและแปลงหน่วยเป็นกิโลเมตรต่อชั่วโมง
+          print("ID:",track.track_id," speed: ",speed)
+          speed_list.append(speed)
           
       if track_cls == "car":
         cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (0, 255, 0), 2)
@@ -231,14 +227,6 @@ def main(_argv):
     cv2.putText(frame, "frame_index {}".format(str(frame_index+1)), (int(0.5 * frame.shape[1]), int(0.9 * frame.shape[0])), 0,
                   1.5e-3 * frame.shape[0], (255, 255, 255), 2)
     
-    speed_size = len(speed_avg_list)
-    sum = 0
-    for s in speed_avg_list:
-      sum += int(s) 
-    if(speed_size != 0):
-      speed_avg = sum/speed_size
-    print("speed_avg : ",speed_avg)
-    
     if writeVideo_flag:
         # save a frame
         out.write(frame)
@@ -255,7 +243,8 @@ def main(_argv):
 
   fps_imutils.stop()
   print('imutils FPS: {}'.format(fps_imutils.fps()))
-
+  
+  print("speed_list",speed_list)
   if asyncVideo_flag:
     video_capture.stop()
   else:

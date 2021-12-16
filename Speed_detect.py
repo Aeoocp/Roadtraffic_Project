@@ -87,6 +87,7 @@ def main(_argv):
   already_counted2 = deque(maxlen=50) # temporary memory for storing counted IDs forLine2
   memory = {}
   speed_mem = {}
+  speed_mem_list = {}
   speed_list = []   # store final speed
   
   ret, frame = video_capture.read()  # frame shape 640*480*3
@@ -207,16 +208,12 @@ def main(_argv):
             if(time_tract!=0):
               speed = (distance/time_tract)*3.6 #คำนวณและแปลงหน่วยเป็นกิโลเมตรต่อชั่วโมง
               print("ID:",track.track_id," speed: ",speed)
-              speed_list.append(speed)
+              speed_mem_list[track.track_id] = deque(maxlen=2)
+              speed_mem_list[track.track_id].append(speed)
           
-      if track_cls == "car":
-        cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (0, 255, 0), 2)
-        cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1])), 0, 1.5e-3 * frame.shape[0], (0, 255, 0), 2)
-        cv2.putText(frame, str(track_cls), (int(bbox[0]), int(bbox[3])), 0, 1.5e-3 * frame.shape[0], (0, 255, 0), 2)
-      else:
-        cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (0, 0, 255), 2)
-        cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[1]-25)), 0, 1.5e-3 * frame.shape[0], (0, 0, 255), 2)
-        cv2.putText(frame, str(track_cls), (int(bbox[0]), int(bbox[3])), 0, 1.5e-3 * frame.shape[0], (0, 0, 255), 2)
+      cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[3])), 0, 1.5e-3 * frame.shape[0], (255, 0, 0), 2)
+      if track.track_id in speed_mem_list:
+        cv2.putText(frame, str(speed_mem_list[track.track_id]), (int(bbox[2]), int(bbox[1])), 0, 1.5e-3 * frame.shape[0], (0, 0, 255), 2)
 
     # Delete memory of old tracks.
     # This needs to be larger than the number of tracked objects in the frame.  

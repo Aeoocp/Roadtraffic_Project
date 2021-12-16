@@ -182,10 +182,8 @@ def main(_argv):
           intersect_info[ll].append([track_cls, origin_midpoint, intersection_time])
         line_o = line2[ll]
         TC2 = CheckCrossLine.LineCrossing(midpoint, previous_midpoint, line_o[0] ,line_o[1])
-        if TC2 and (track.track_id not in already_counted2):
+        if TC2 and (track.track_id not in already_counted2) and (track.track_id in already_counted1):
           speed_mem[track.track_id].append(frame_index+1)
-          print("id",track.track_id)
-          print("speed_mem[track.track_id]",speed_mem[track.track_id])
           class_counter[ll][track_cls] += 1
           total_counter[ll] += 1
           # draw alert line
@@ -195,22 +193,18 @@ def main(_argv):
           intersect_info[ll].append([track_cls, origin_midpoint, intersection_time])
         
         if track.track_id in speed_mem:
-          print(len(speed_mem[track.track_id]))
           if(len(speed_mem[track.track_id])==2):
             trackTime1 = speed_mem[track.track_id].popleft()
             trackTime2 = speed_mem[track.track_id].popleft()
             distance = 4.5 #ระยะทางหน่วยเมตร 
             time_tract = (trackTime2-trackTime1)/30 #เวลาที่จับได้ในหน่วยวินาที
-            print("ID",track.track_id)
-            print("trackTime1",trackTime1)
-            print("trackTime2",trackTime2)
-            print("time_tract",time_tract)
             if(time_tract!=0):
               speed = (distance/time_tract)*3.6 #คำนวณและแปลงหน่วยเป็นกิโลเมตรต่อชั่วโมง
               print("ID:",track.track_id," speed: ",speed)
               speed_mem_list[track.track_id] = speed
+              speed_list.append(speed)
           
-      cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[3])), 0, 1.5e-3 * frame.shape[0], (255, 0, 0), 2)
+      cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[3])), 0, 1.0e-3 * frame.shape[0], (255, 255, 255), 2)
       if track.track_id in speed_mem_list:
         cv2.putText(frame, str(speed_mem_list[track.track_id]), (int(bbox[2]), int(bbox[1])), 0, 1.5e-3 * frame.shape[0], (0, 0, 255), 2)
 

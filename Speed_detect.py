@@ -208,8 +208,7 @@ def main(_argv):
             if(time_tract!=0):
               speed = (distance/time_tract)*3.6 #คำนวณและแปลงหน่วยเป็นกิโลเมตรต่อชั่วโมง
               print("ID:",track.track_id," speed: ",speed)
-              speed_mem_list[track.track_id] = deque(maxlen=2)
-              speed_mem_list[track.track_id].append(speed)
+              speed_mem_list[track.track_id] = speed
           
       cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[3])), 0, 1.5e-3 * frame.shape[0], (255, 0, 0), 2)
       if track.track_id in speed_mem_list:

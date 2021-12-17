@@ -199,9 +199,9 @@ def main(_argv):
             time_tract = (trackTime2-trackTime1)/30 #เวลาที่จับได้ในหน่วยวินาที
             if(time_tract!=0):
               speed = (distance/time_tract)*3.6 #คำนวณและแปลงหน่วยเป็นกิโลเมตรต่อชั่วโมง
-              print("ID:",track.track_id," speed: ",speed)
-              speed_mem_list[track.track_id] = speed
-              speed_list.append(speed)
+              print("ID:",track.track_id," speed: ",f'{speed:.2f}')
+              speed_mem_list[track.track_id] = f'{speed:.2f}'
+              speed_list.append(f'{speed:.2f}')
           
       cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[3])), 0, 1.0e-3 * frame.shape[0], (255, 255, 255), 2)
       cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (255, 255, 255), 2)

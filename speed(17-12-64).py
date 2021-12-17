@@ -206,7 +206,7 @@ def main(_argv):
       cv2.putText(frame, "ID: " + str(track.track_id), (int(bbox[0]), int(bbox[3])), 0, 1.0e-3 * frame.shape[0], (255, 255, 255), 2)
       cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (255, 255, 255), 2)
       if track.track_id in speed_mem_list:
-        cv2.putText(frame, str(speed_mem_list[track.track_id]), (int(bbox[2]), int(bbox[1])), 0, 1.5e-3 * frame.shape[0], (0, 0, 255), 2)
+        cv2.putText(frame, str(speed_mem_list[track.track_id]), (int(bbox[2]), int(bbox[3])), 0, 1.5e-3 * frame.shape[0], (0, 0, 255), 2)
 
     # Delete memory of old tracks.
     # This needs to be larger than the number of tracked objects in the frame.  

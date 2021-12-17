@@ -221,7 +221,6 @@ def main(_argv):
       cv2.putText(frame, "Total{}: {}".format(str(xx),str(total_counter[ll])), (int(0.05 * frame.shape[1]), int(yy)), 0,
                 1.5e-3 * frame.shape[0], (0, 255, 255), 2)
       yy += 0.1 * frame.shape[0]
-      print("Total",xx,": ",total_counter[ll])
       
     cv2.putText(frame, "frame_index {}".format(str(frame_index+1)), (int(0.5 * frame.shape[1]), int(0.9 * frame.shape[0])), 0,
                   1.5e-3 * frame.shape[0], (255, 255, 255), 2)
@@ -243,6 +242,7 @@ def main(_argv):
   fps_imutils.stop()
   print('imutils FPS: {}'.format(fps_imutils.fps()))
   
+  print("Total",xx,": ",total_counter[ll])
   print("speed_list",speed_list)
   print("speed_list_side",len(speed_list))
   if asyncVideo_flag:

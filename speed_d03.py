@@ -70,8 +70,8 @@ def main(_argv):
   line2_ac = deque(maxlen=50) # temporary memory for storing counted IDs forLine2
   memory = {}     # เก็บว่าเคยพิจารณาIDนี้ไปหรือยัง + ไว้เก็บmidpointไม่เกิน 2 จุด
   time_mem = {}   # เก็บframeที่IDนั้นๆผ่านของแต่ละเส้น
-  speed_list = [] # ลิสความเร็วทั้งหมดที่คำนวณได้
-  speed_avg = 0   # ค่าเฉลี่ยความเร็วทั้งหมด
+  speed_list = {} # ลิสความเร็วทั้งหมดที่คำนวณได้
+  speed_avg = 0   # ค่าเฉลี่ยความเร็วทั้งหมด        
   
   ret, frame = video_capture.read()  # frame shape 640*480*3
   #สร้างเส้นผ่าน
@@ -182,10 +182,11 @@ def main(_argv):
         if track.track_id in time_mem and len(time_mem[track.track_id]) == 2:
           time1 = time_mem[track.track_id][0]
           time2 = time_mem[track.track_id][1]
+          time_mem[track.track_id] = []
           distance = 40 #ระยะทางหน่วยเมตร 
           realtime = (time2-time1)/30 # แปลงเวลาในหน่วยเฟรมเป็นวินาที
           speed = (distance/realtime)*3.6 # คำนวณและแปลงหน่วยเป็นกิโลเมตรต่อชั่วโมง
-          speed_list.append(speed)
+          speed_list[track.track_id] = speed
           savg = 0
           co = len(speed_list)
           for s in speed_list:
@@ -209,11 +210,11 @@ def main(_argv):
       cv2.putText(frame, "Total{}: {},{}".format(str(xx),str(line_tc[ll][0]),str(line_tc[ll][1])), (int(0.05 * frame.shape[1]), int(yy)), 0,
                 1.5e-3 * frame.shape[0], (0, 255, 255), 2)
       yy += 0.1 * frame.shape[0]
-      print("Total",xx,": ",line_tc[ll])
+#    print("Frame:",frame_index,": ",line_tc[ll])
       
     cv2.putText(frame, "frame_index {}".format(str(frame_index+1)), (int(0.5 * frame.shape[1]), int(0.9 * frame.shape[0])), 0,
                   1.5e-3 * frame.shape[0], (255, 255, 255), 2)
-    cv2.putText(frame, "speed_avg {}".format('%.2f' % speed_avg), (int(0.5 * frame.shape[1]), int(0.1 * frame.shape[0])), 0,
+    cv2.putText(frame, "speed_avg {}".format(speed_avg), (int(0.5 * frame.shape[1]), int(0.1 * frame.shape[0])), 0,
                   1.5e-3 * frame.shape[0], (255, 255, 255), 2)
     
     out.write(frame)
@@ -228,7 +229,9 @@ def main(_argv):
 
   fps_imutils.stop()
   print('imutils FPS: {}'.format(fps_imutils.fps()))
-
+  print('speed_avg : {}'.format(str(speed_avg)))
+  print('จำนวนรถที่วัดความเร็วได้',len(speed_list))
+  print('จำนวนรถทั้งหมด',str(line_tc))
   video_capture.release()
   out.release()
   cv2.destroyAllWindows()

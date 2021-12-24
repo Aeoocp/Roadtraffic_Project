@@ -179,7 +179,7 @@ def main(_argv):
           intersection_time = datetime.datetime.now() - datetime.timedelta(microseconds=datetime.datetime.now().microsecond)
           intersect_info[ll].append([track_cls, origin_midpoint, intersection_time])
         
-        if len(time_mem[track.track_id]) == 2:
+        if track.track_id in time_mem and len(time_mem[track.track_id]) == 2:
           time1 = time_mem[track.track_id][0]
           time2 = time_mem[track.track_id][1]
           distance = 40 #ระยะทางหน่วยเมตร 

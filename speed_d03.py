@@ -179,7 +179,7 @@ def main(_argv):
           intersection_time = datetime.datetime.now() - datetime.timedelta(microseconds=datetime.datetime.now().microsecond)
           intersect_info[ll].append([track_cls, origin_midpoint, intersection_time])
         
-        if len(time_mem[track.track_id]) == 2 
+        if len(time_mem[track.track_id]) == 2:
           time1 = time_mem[track.track_id][0]
           time2 = time_mem[track.track_id][1]
           distance = 40 #ระยะทางหน่วยเมตร 
@@ -188,7 +188,7 @@ def main(_argv):
           speed_list.append(speed)
           savg = 0
           co = len(speed_list)
-          for s in speed_list
+          for s in speed_list:
             savg += s
           speed_avg = s/co
           print("Frame:",frame_index ," ID:" ,track.track_id ," speed:" ,speed)

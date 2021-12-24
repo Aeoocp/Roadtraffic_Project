@@ -190,7 +190,7 @@ def main(_argv):
           co = len(speed_list)
           for s in speed_list:
             savg += s
-          speed_avg = s/co
+          speed_avg = savg/co
           print("Frame:",frame_index ," ID:" ,track.track_id ," speed:" ,speed)
           
       cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (0, 255, 0), 2)

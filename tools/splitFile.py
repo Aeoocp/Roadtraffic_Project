@@ -29,7 +29,6 @@ def spilttxt(input_T):
   confidence_s = []
   classes_s = []
   last_frame = frame[len(frame)-1]
-  print(last_frame)
   xf = 0
   for f in range(len(frame)-1):
     subclass = [] 

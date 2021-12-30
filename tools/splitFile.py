@@ -3,7 +3,7 @@ def spilttxt(input_T):
   FileContent = file1.read()
   AS = FileContent.split()
   inform = []
-  car_num = []
+  frame = []
   
   c = -1
   y = 0
@@ -12,7 +12,8 @@ def spilttxt(input_T):
     if y == 0:
       if AS[x] == "#":
         c = c+1
-        car_num.append(AS[x+3])
+        fn = AS[x+2].split(',')
+        frame.append(int(fn[0]))
         skip = x+3
         inform.append([])
       elif len(xx) == 2:
@@ -27,13 +28,21 @@ def spilttxt(input_T):
   boxes_s = []
   confidence_s = []
   classes_s = []
-  
-  for a in range(len(inform)):
+  last_frame = frame[len(frame)-1]
+  print(last_frame)
+  xf = 0
+  for f in range(len(frame)-1):
     subclass = [] 
     subconfidence = []
     subbox = []
-    for b in range(len(inform[a])):
-      eachBox = inform[a][b]
+    while (xf != int(frame[f])):
+      classes_s.append(subclass)
+      confidence_s.append(subconfidence)
+      boxes_s.append(subbox)
+      xf += 1
+    xf += 1
+    for b in range(len(inform[f])):
+      eachBox = inform[f][b]
       SEachBox = eachBox.split(',')
       Frame = SEachBox[0]
       subclass.append(SEachBox[1])

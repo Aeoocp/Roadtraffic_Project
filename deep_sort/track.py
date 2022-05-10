@@ -64,7 +64,7 @@ class Track:
         self.mean = mean
         self.covariance = covariance
         self.track_id = track_id
-        self.hits = 1
+        self.hits = 0
         self.age = 1
         self.time_since_update = 0
         self.det_cls = cls  # the class from detection
@@ -116,6 +116,16 @@ class Track:
         '''
         minX, minY, maxX, maxY = box
         midpoint = (int((minX + maxX) / 2), int((minY + maxY) / 2))  # minus y coordinates to get proper xy format
+        return midpoint
+
+    @staticmethod
+    def tlbr_midpoint2(box):
+        '''
+        Finds midpoint of a box in tlbr format.
+        '''
+        minX, minY, maxX, maxY = box
+        Y = (maxY-minY)/6
+        midpoint = (int((minX + maxX) / 2), int((minY + maxY) / 2 + Y))  # minus y coordinates to get proper xy format
         return midpoint
         
     def predict(self, kf):

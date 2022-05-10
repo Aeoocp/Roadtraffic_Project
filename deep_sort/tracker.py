@@ -53,7 +53,7 @@ class Tracker:
             track.predict(self.kf)
 
     def update(self, detections):
-        
+        d = detections[0]
         """Perform measurement update and track management.
         Parameters
         ----------
@@ -63,7 +63,6 @@ class Tracker:
         # Run matching cascade.
         matches, unmatched_tracks, unmatched_detections = \
             self._match(detections)
-        
         # Update track set.
         for track_idx, detection_idx in matches:
             self.tracks[track_idx].update(
@@ -72,6 +71,7 @@ class Tracker:
             self.tracks[track_idx].mark_missed()
         for detection_idx in unmatched_detections:
             self._initiate_track(detections[detection_idx])
+
         self.tracks = [t for t in self.tracks if not t.is_deleted()]
         # Update distance metric.
         active_targets = [t.track_id for t in self.tracks if t.is_confirmed()]

@@ -214,7 +214,7 @@ def changelen(frame, track, memory, line, ac, linecross_counter):
     n = 0
     for l in line:
         if not tc:
-            tc, ncross = CheckCrossLine.LinesCrossing(midpoint, previous_midpoint, l[0], l[1], tc, n)
+            tc, ncross = CheckCrossLine.LinesCrossing(midpoint, previous_midpoint, l[0], l[1], n)
             if not tc:
                 n = n+1
     if tc and (track.track_id not in ac):

@@ -19,5 +19,11 @@ YOLOX is one version of YOLO (algorithm that uses deep convolutional neural netw
 
 DeepSORT (Simple Online and Realtime Tracking with a Deep Association Metric) used for building highly accurate object trackers. Check out on [THIS LINK](https://arxiv.org/pdf/1703.07402.pdf) to see more impormation about DeepSORT.
 
-## Demo of Object Tracker on Cars
+# Demo of Object Tracker on Cars
 <p align="center"><img src="img/Demo.gif"\></p>
+
+# Getting Started
+
+# References
+* https://github.com/LeonLok/Multi-Camera-Live-Object-Tracking
+* https://github.com/dungdo123/Code_Interview/tree/main/Vehicle_Speed_Estimation

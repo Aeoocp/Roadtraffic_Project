@@ -5,6 +5,14 @@ in name "Road traffic monitoring and warning system"
 
 Paper File : https://drive.google.com/file/d/11wYbHBo3nXdI3FkjMStdxXGs9sFyXHdt/view?usp=sharing
 
+About
+   - Object Detection and Classification vehicle
+   - Object Tracking
+   - Vehicle counting
+   - Speed measurement
+   - Assess traffic conditions
+   - Lane change detection
+
 ## Tools: 
 
    - Python
@@ -24,6 +32,10 @@ DeepSORT (Simple Online and Realtime Tracking with a Deep Association Metric) us
 <p align="center"><img src="img/Demo.gif"\></p>
 
 # Getting Started
+What do you need?
+1.Model file (You can dowload model from [THIS](https://drive.google.com/file/d/1WCsGlk9X613VBFC8C55vYCkqVZ2m8VaD/view?usp=sharing)(.pth.tar))
+2.Camer url(.m3u8) or File video(.mkv)
+3.In Vehicle counting, Speed measurement and Lane change detection Step you need to set the position for tracking line. So I have created [google colab](https://colab.research.google.com/drive/1dyjxNsnXV2cV3UYk7H1b3J-sx-v-pU5i?usp=sharing) for test specifying position of line.
 
 # References
 * https://github.com/LeonLok/Multi-Camera-Live-Object-Tracking

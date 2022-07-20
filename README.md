@@ -13,6 +13,7 @@ Paper File : https://drive.google.com/file/d/11wYbHBo3nXdI3FkjMStdxXGs9sFyXHdt/v
    - Pycharm 
    
 ##YOLOX and DeepSORT
+
 Object tracking implemented with YOLOX, DeepSort, and TensorFlow.
 
 YOLOX is one version of YOLO (algorithm that uses deep convolutional neural networks to perform object detections), with a better performance. You can check out on [THIS LINK](https://github.com/Megvii-BaseDetection/YOLOX) to see more impormation about YOLOX.

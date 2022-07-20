@@ -35,16 +35,38 @@ DeepSORT (Simple Online and Realtime Tracking with a Deep Association Metric) us
 What do you need?
 
    1. Model file : You can dowload model from [THIS LINK](https://drive.google.com/file/d/1WCsGlk9X613VBFC8C55vYCkqVZ2m8VaD/view?usp=sharing) (.pth.tar)
-   2. Camer url (.m3u8) or File video (.mkv)
+   1.5 *recommend to put this file in main project floder*
+   2. Camera url (.m3u8) or File video (.mkv)
    3. In Vehicle counting, Speed measurement and Lane change detection Step you need to set the position for tracking line : So I have created [GOOGLE COLAB](https://colab.research.google.com/drive/1dyjxNsnXV2cV3UYk7H1b3J-sx-v-pU5i?usp=sharing) for test specifying position of line.
    4. Other Parameter 
 ```bash
-#Example and recommend
+#Example 
 webcam -n yolox-s -c latest-300_ckpt.pth.tar --path https://camerai1.iticfoundation.org/pass/180.180.242.207:1935/Phase3/PER_3_004_IN.stream/chunklist_w304784440.m3u8 
 --type C --lineC 0.65,0.325,0.95,0.45 --skipframe 3 --conf 0.25 --nms 0.45 --tsize 640 --save_result --device cpu
 
 # explain Parameter 
-
+   1. video/webcam 
+     #choose type of input file
+   2. -n model type -c model file name
+     #from model type and model file name
+   3.1 --path video/....mkv
+   3.2 --path https://....m3u8 
+     #path of your video (3.1) or camera url (3.2) in project floder
+   4. --type C/S/CL/All
+     #####
+     - C is Vehicle counting
+     - S is Speed measurement
+     - CL is Lane change
+     - All is do all every function
+     #####
+   5. --lineC/S/CL
+     #The positions of tracking line
+   5.1 --lineN
+     #Number of tracking line if you want to use Lane change function
+   6. --skipframe
+     #number of frames to be skip
+   7. --conf 0.25 --nms 0.45 --tsize 640
+     #recommend Parameter for DeepSORT 
 ```
 
 # References

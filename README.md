@@ -12,7 +12,7 @@ Paper File : https://drive.google.com/file/d/11wYbHBo3nXdI3FkjMStdxXGs9sFyXHdt/v
    - YoloX
    - Pycharm 
    
-##YOLOX and DeepSORT
+## YOLOX and DeepSORT
 
 Object tracking implemented with YOLOX, DeepSort, and TensorFlow.
 
